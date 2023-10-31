@@ -1,0 +1,47 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaApplication1.ViewModels"
+        xmlns:cc="using:AvaloniaApplication1.Views"
+        xmlns:models="using:AvaloniaApplication1.Models"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" MinWidth="800" MinHeight="450"
+        x:Class="AvaloniaApplication1.CreateRewardWindow"
+        x:DataType="vm:CreateRewardWindowViewModel"
+        Title="CreateRewardWindow">
+  <Design.DataContext >
+    <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:CreateRewardWindowViewModel/>
+  </Design.DataContext>
+  <Grid RowDefinitions="*, 45">
+    <DockPanel Margin="5">
+      <Grid ColumnDefinitions="*, *, 160" DockPanel.Dock="Top">
+        <TextBox Margin="0,0,5,10" VerticalAlignment="Bottom" Watermark="Reward Title" Text="{Binding Title}" MaxHeight="32"/>
+        <StackPanel Grid.Column="1" Margin="5,0,5,10">
+          <Label>Reward Cost</Label>
+          <NumericUpDown Watermark="Reward Cost" Value="{Binding Cost}" Minimum="10" Increment="1" />
+        </StackPanel>
+        <CheckBox Grid.Column="2" Padding="8,0,0,1" VerticalAlignment="Bottom" Margin="5,0,0,10" IsChecked="{Binding RequireInput}">Require User Input</CheckBox>
+      </Grid>
+      <Border BorderBrush="#99FFFFFF" BorderThickness="1" CornerRadius="5">
+        <ListBox ItemsSource="{Binding Actions}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:RewardActionViewModel">
+              <cc:RewardActionView DataContext="{Binding }" Padding="0"/>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Border>
+    </DockPanel>
+    <Button Grid.Row="1" Command="{Binding CreateTwitchRewardCommand}" Content="Create Reward" HorizontalAlignment="Center"/>
+    <Button Grid.Row="1" Command="{Binding AddActionCommand}" Margin="0,0,5,0" Content="Add Action" HorizontalAlignment="Right"/>
+  </Grid>
+  
+  <Window.Styles>
+    <Style Selector="ListBoxItem">
+      <Setter Property="Padding" Value="0"/>
+      <Setter Property="Margin" Value="5"/>
+    </Style>
+  </Window.Styles>
+</Window>

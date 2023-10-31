@@ -1,0 +1,155 @@
+﻿using AvaloniaApplication1.Auth;
+using AvaloniaApplication1.Data.Abstractions.Repositories;
+using AvaloniaApplication1.Models;
+using AvaloniaApplication1.ViewModels;
+using DynamicData;
+using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TwitchLib.Api;
+using TwitchLib.Api.Core.Enums;
+using TwitchLib.Api.Helix.Models.ChannelPoints;
+using TwitchLib.Api.Helix.Models.ChannelPoints.CreateCustomReward;
+using TwitchLib.Api.Helix.Models.ChannelPoints.UpdateCustomReward;
+using TwitchLib.Api.Helix.Models.ChannelPoints.UpdateCustomRewardRedemptionStatus;
+
+namespace AvaloniaApplication1.Services
+{
+    public class TwitchPointRewardService
+    {
+        private readonly ILogger<TwitchPointRewardService> _logger;
+        private readonly TwitchAPI _apiClient;
+        private readonly IAuthenticationService _twitchAuthService;
+        private readonly IRewardRepository _rewardRepository;
+        public TwitchPointRewardService(
+            IAuthenticationService twitchAuthService, ILoggerFactory loggerFactory, IRewardRepository rewardRepository)
+        {
+            _twitchAuthService = twitchAuthService;
+            _rewardRepository = rewardRepository;
+            _logger = loggerFactory.CreateLogger<TwitchPointRewardService>();
+            _apiClient = new TwitchAPI(loggerFactory);
+            _apiClient.Settings.ClientId = _twitchAuthService.AuthConfig.ClientId;
+            _apiClient.Settings.Secret = _twitchAuthService.AuthConfig.ClientSecret;
+        }
+        public async Task<TwitchReward?> CreateReward(string title, int cost, bool requireInput, IList<RewardActionViewModel> actions)
+        {
+            await _twitchAuthService.EnsureValidTokenAsync();
+            var res = await _apiClient.Helix.ChannelPoints.CreateCustomRewardsAsync(_twitchAuthService.AuthConfig.Uid, new CreateCustomRewardsRequest
+            {
+                Title = title,
+                Cost = cost,
+                IsUserInputRequired = requireInput
+            }, accessToken: _twitchAuthService.AuthConfig.AccessToken);
+            var entry = res.Data.First();
+            var dbEntry = new TwitchReward
+            {
+                Id = entry.Id,
+                Title = entry.Title,
+                Cost = entry.Cost
+            };
+
+            dbEntry.KeyboardActions.AddRange(actions
+                .Where(x => x.ActionType == ActionType.Keyboard)
+                .Select(x => KeyboardRewardAction.FromVMType(dbEntry, x)).ToList());
+            dbEntry.MouseActions.AddRange(actions
+                .Where(x => x.ActionType == ActionType.Mouse)
+                .Select(x => MouseRewardAction.FromVMType(dbEntry, x)).ToList());
+
+            var transaction = _rewardRepository.UnitOfWork.BeginTransaction();
+            try
+            {
+                await _rewardRepository.AddAsync(dbEntry);
+                await _rewardRepository.UnitOfWork.SaveChangesAsync();
+
+                await _rewardRepository.UnitOfWork.CommitTransactionAsync();
+
+                return dbEntry;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "Failed to create db entry for reward, rolling back changes");
+                await DeleteReward(dbEntry);
+                await transaction.RollbackAsync();
+            }
+            return null;
+        }
+
+        public async Task<TwitchReward> GetReward(string id)
+        {
+            var dbEntry = await _rewardRepository.FindAsync(id);
+            if (dbEntry is null)
+            {
+                _logger.LogWarning("entry with id {id} not stored in local db, requesting info from twitch", id);
+
+                await _twitchAuthService.EnsureValidTokenAsync();
+                var response = await _apiClient.Helix.ChannelPoints.GetCustomRewardAsync(_twitchAuthService.AuthConfig.Uid, new List<string> { id },
+                    accessToken: _twitchAuthService.AuthConfig.AccessToken);
+                var remoteEntry = response.Data.First();
+                dbEntry = TwitchReward.FromRemote(remoteEntry);
+                await _rewardRepository.AddAsync(dbEntry);
+            }
+            return dbEntry;
+        }
+
+        public IQueryable<TwitchReward> GetAll() => _rewardRepository.GetAll();
+
+        public async Task UpdateReward(TwitchReward reward)
+        {
+            _rewardRepository.Update(reward);
+            await _rewardRepository.UnitOfWork.SaveChangesAsync();
+
+            await _twitchAuthService.EnsureValidTokenAsync();
+            await _apiClient.Helix.ChannelPoints.UpdateCustomRewardAsync(_twitchAuthService.AuthConfig.Uid, reward.Id, new UpdateCustomRewardRequest
+            {
+                IsEnabled = reward.IsEnabled,
+                Title = reward.Title,
+                Cost = reward.Cost,
+                IsUserInputRequired = reward.RequireInput,
+            }, accessToken: _twitchAuthService.AuthConfig.AccessToken);
+        }
+        public async Task DeleteReward(TwitchReward reward)
+        {
+            try
+            {
+                await _twitchAuthService.EnsureValidTokenAsync();
+                await _apiClient.Helix.ChannelPoints
+                    .DeleteCustomRewardAsync(_twitchAuthService.AuthConfig.Uid, reward.Id, accessToken: _twitchAuthService.AuthConfig.AccessToken);
+            }
+            catch (Exception ex) { _logger.LogCritical(ex, "Failed to delte reward from twitch"); }
+            finally
+            {
+                _rewardRepository.Delete(reward);
+                await _rewardRepository.UnitOfWork.SaveChangesAsync();
+            }
+        }
+
+        public async Task<RewardRedemption[]> GetRewardRedemptions(string rewardId, params string[] redemptionIds)
+        {
+            await _twitchAuthService.EnsureValidTokenAsync();
+            var res = await _apiClient
+                .Helix
+                .ChannelPoints
+                .GetCustomRewardRedemptionAsync(
+                _twitchAuthService.AuthConfig.Uid,
+                rewardId, new List<string>(redemptionIds), accessToken: _twitchAuthService.AuthConfig.AccessToken);
+
+            return res.Data;
+        }
+        public async Task UpdateRewardRedemption(string rewardId, CustomRewardRedemptionStatus newStatus, params string[] redemptionIds)
+        {
+            await _twitchAuthService.EnsureValidTokenAsync();
+
+            await _apiClient.Helix.ChannelPoints.UpdateRedemptionStatusAsync(
+                _twitchAuthService.AuthConfig.Uid, rewardId,
+                    new List<string>(redemptionIds),
+                    new UpdateCustomRewardRedemptionStatusRequest
+                    {
+                        Status = newStatus
+                    }, accessToken: _twitchAuthService.AuthConfig.AccessToken);
+        }
+
+    }
+}

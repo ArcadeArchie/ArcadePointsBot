@@ -1,0 +1,68 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:AvaloniaApplication1.ViewModels"
+        xmlns:mm="using:AvaloniaApplication1.Models"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
+        xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
+        xmlns:system="using:System"
+        mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+        x:Class="AvaloniaApplication1.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Icon="/Assets/avalonia-logo.ico"
+        Title="AvaloniaApplication1">
+  <Design.DataContext >
+    <!-- This only sets the DataContext for the previewer in an IDE,
+             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
+    <vm:MainWindowViewModel StatusText="Auth OK"/>
+  </Design.DataContext>
+  <Grid RowDefinitions="*,*,*,45">
+    <ListBox Grid.RowSpan="3" Margin="5" CornerRadius="5"
+             ItemsSource="{Binding Rewards}">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="mm:TwitchReward">
+          <DockPanel>
+            <Label DockPanel.Dock="Left" Content="Title: " VerticalAlignment="Center"/>
+            <TextBlock DockPanel.Dock="Left" Text="{Binding Title}" VerticalAlignment="Center"/>
+            <Label DockPanel.Dock="Left" Content="Cost: " VerticalAlignment="Center"/>
+            <TextBlock DockPanel.Dock="Left" Text="{Binding Cost}" VerticalAlignment="Center"/>
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+              <CheckBox IsChecked="{Binding IsEnabled}" Margin="5,0" Click="OnEnabledChanged">Enabled</CheckBox>
+              <Button IsEnabled="False" Content="Edit" Margin="5,0"/>
+              <Button Content="Delete" Margin="5,0"
+                      Command="{ReflectionBinding Path=DataContext.DeleteRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                      CommandParameter="{Binding }" />
+            </StackPanel>
+            <Grid></Grid>
+          </DockPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <Border Name="Status" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center"
+            BorderThickness="1" BorderBrush="LightYellow" CornerRadius="5"
+            Margin="5,0,0,5" Padding="5">
+      <TextBlock Name="StatusTextblock" Text="{Binding StatusText}"/>
+    </Border>
+    <Button Grid.Row="4" HorizontalAlignment="Right" Margin="0,0,5,0"
+      Content="Create Reward" Command="{Binding CreateRewardCommand}"/>
+  </Grid>
+
+  <i:Interaction.Behaviors>
+    <ia:DataTriggerBehavior Binding="{Binding StatusText}" ComparisonCondition="Equal" Value="Checking Auth status">
+      <ia:ChangePropertyAction TargetObject="{Binding #StatusTextblock}" PropertyName="Foreground" Value="Black"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="Background" Value="LightYellow"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="BorderBrush" Value="Yellow"/>
+    </ia:DataTriggerBehavior>
+    <ia:DataTriggerBehavior Binding="{Binding StatusText}" ComparisonCondition="Equal" Value="Auth OK">
+      <ia:ChangePropertyAction TargetObject="{Binding #StatusTextblock}" PropertyName="Foreground" Value="White"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="BorderBrush" Value="Green"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="Background" Value="DarkGreen"/>
+    </ia:DataTriggerBehavior>
+    <ia:DataTriggerBehavior Binding="{Binding StatusText}" ComparisonCondition="Equal" Value="Authenticating with twitch failed, check logs">
+      <ia:ChangePropertyAction TargetObject="{Binding #StatusTextblock}" PropertyName="Foreground" Value="White"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="BorderBrush" Value="Red"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="Background" Value="DarkRed"/>
+    </ia:DataTriggerBehavior>
+  </i:Interaction.Behaviors>
+</Window>
