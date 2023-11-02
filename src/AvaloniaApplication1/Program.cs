@@ -127,7 +127,7 @@ namespace AvaloniaApplication1
             services.AddScoped(typeof(IEntityRepository<,>), typeof(DataEntityRepository<,>));
             services.AddScoped<IRewardRepository, RewardRepository>();
 
-            services.AddHostedService<TwitchWorker>();
+            services.AddSingleton<TwitchWorker>();
 
             services.AddScoped<CreateRewardWindowViewModel>();
             services.AddScoped<MainWindowViewModel>();

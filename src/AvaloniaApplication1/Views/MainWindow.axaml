@@ -2,6 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AvaloniaApplication1.ViewModels"
         xmlns:mm="using:AvaloniaApplication1.Models"
+        xmlns:app="using:AvaloniaApplication1"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
@@ -17,6 +18,14 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:MainWindowViewModel StatusText="Auth OK"/>
   </Design.DataContext>
+  
+  <Window.Resources>
+    <app:WorkerStatus x:Key="WorkerStatus1">Stopped</app:WorkerStatus>
+    <app:WorkerStatus x:Key="WorkerStatusErr">Errored</app:WorkerStatus>
+    <app:WorkerStatus x:Key="WorkerStatusStart">Starting</app:WorkerStatus>
+    <app:WorkerStatus x:Key="WorkerStatusRunning">Running</app:WorkerStatus>
+  </Window.Resources>
+  
   <Grid RowDefinitions="*,*,*,45">
     <ListBox Grid.RowSpan="3" Margin="5" CornerRadius="5"
              ItemsSource="{Binding Rewards}">
@@ -29,9 +38,11 @@
             <TextBlock DockPanel.Dock="Left" Text="{Binding Cost}" VerticalAlignment="Center"/>
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
               <CheckBox IsChecked="{Binding IsEnabled}" Margin="5,0" Click="OnEnabledChanged">Enabled</CheckBox>
-              <Button IsEnabled="False" Content="Edit" Margin="5,0"/>
+              <Button Content="Edit" Margin="5,0"
+                      Command="{ReflectionBinding Path=DataContext.EditRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                      CommandParameter="{Binding }"/>
               <Button Content="Delete" Margin="5,0"
-                      Command="{ReflectionBinding Path=DataContext.DeleteRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}" 
+                      Command="{ReflectionBinding Path=DataContext.DeleteRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                       CommandParameter="{Binding }" />
             </StackPanel>
             <Grid></Grid>
@@ -39,11 +50,21 @@
         </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
-    <Border Name="Status" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center"
-            BorderThickness="1" BorderBrush="LightYellow" CornerRadius="5"
-            Margin="5,0,0,5" Padding="5">
-      <TextBlock Name="StatusTextblock" Text="{Binding StatusText}"/>
-    </Border>
+    <StackPanel Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center" Orientation="Horizontal">
+      <Border Name="Status" VerticalAlignment="Center"
+              BorderThickness="1" BorderBrush="LightYellow" CornerRadius="5"
+              Margin="5,0,0,5" Padding="5">
+        <TextBlock Name="StatusTextblock" Text="{Binding StatusText}"/>
+      </Border>
+      <Border Name="WorkerStatus" Grid.Row="4" HorizontalAlignment="Left" VerticalAlignment="Center"
+              BorderThickness="1" BorderBrush="LightYellow" CornerRadius="5"
+              Margin="5,0,0,5" Padding="2">
+        <StackPanel Orientation="Horizontal">
+          <Label Name="WorkerStatusLabel" VerticalAlignment="Center">PubSub</Label>
+          <TextBlock VerticalAlignment="Center" Name="WorkerStatusTextblock" Text="{Binding WorkerStatus}" Padding="0,0,5,0"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
     <Button Grid.Row="4" HorizontalAlignment="Right" Margin="0,0,5,0"
       Content="Create Reward" Command="{Binding CreateRewardCommand}"/>
   </Grid>
@@ -63,6 +84,25 @@
       <ia:ChangePropertyAction TargetObject="{Binding #StatusTextblock}" PropertyName="Foreground" Value="White"/>
       <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="BorderBrush" Value="Red"/>
       <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="Background" Value="DarkRed"/>
+    </ia:DataTriggerBehavior>
+    
+    <ia:DataTriggerBehavior Binding="{Binding WorkerStatus}" ComparisonCondition="Equal" Value="{StaticResource WorkerStatusErr}">
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatusTextblock}" PropertyName="Foreground" Value="White"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatusLabel}" PropertyName="Foreground" Value="White"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatus}" PropertyName="BorderBrush" Value="Red"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatus}" PropertyName="Background" Value="DarkRed"/>
+    </ia:DataTriggerBehavior>
+    <ia:DataTriggerBehavior Binding="{Binding WorkerStatus}" ComparisonCondition="Equal" Value="{StaticResource WorkerStatusStart}">
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatusTextblock}" PropertyName="Foreground" Value="Black"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatusLabel}" PropertyName="Foreground" Value="Black"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatus}" PropertyName="BorderBrush" Value="LightYellow"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatus}" PropertyName="Background" Value="Yellow"/>
+    </ia:DataTriggerBehavior>
+    <ia:DataTriggerBehavior Binding="{Binding WorkerStatus}" ComparisonCondition="Equal" Value="{StaticResource WorkerStatusRunning}">
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatusTextblock}" PropertyName="Foreground" Value="White"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatusLabel}" PropertyName="Foreground" Value="White"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatus}" PropertyName="BorderBrush" Value="Green"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatus}" PropertyName="Background" Value="DarkGreen"/>
     </ia:DataTriggerBehavior>
   </i:Interaction.Behaviors>
 </Window>

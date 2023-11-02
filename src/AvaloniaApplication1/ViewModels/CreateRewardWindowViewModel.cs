@@ -21,6 +21,8 @@ namespace AvaloniaApplication1.ViewModels
 
         [Reactive]
         public string? Title { get; set; }
+        [Reactive]
+        public string? Category { get; set; }
 
         [Reactive]
         public int Cost { get; set; } = 10;
@@ -28,7 +30,7 @@ namespace AvaloniaApplication1.ViewModels
         [Reactive]
         public bool RequireInput { get; set; }
 
-        public ObservableCollection<RewardActionViewModel> Actions { get; } = new ObservableCollection<RewardActionViewModel>();
+        public ObservableCollection<RewardActionViewModel> Actions { get; } = new();
 
         public ReactiveCommand<Unit, TwitchReward?> CreateTwitchRewardCommand { get; set; }
         public ReactiveCommand<Unit, Unit> AddActionCommand { get; set; }
@@ -71,10 +73,14 @@ namespace AvaloniaApplication1.ViewModels
             Actions.Add(dupedAction);
         }
 
-        Task<TwitchReward?> CreateTwitchReward()
+        async Task<TwitchReward?> CreateTwitchReward()
         {
-            return _pointRewardService
-                .CreateReward(Title!, Cost, RequireInput, Actions);
+            Errors.Clear();
+            var result = await _pointRewardService
+                .CreateReward(Title!, Category, Cost, RequireInput, Actions);
+            if(result.IsSuccess)
+                return result.Value;
+            Errors.Add(result.Error);
             return null;
         }
     }

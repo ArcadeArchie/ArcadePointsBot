@@ -29,6 +29,8 @@ namespace AvaloniaApplication1.Config
             var keyParts = key.Split(':');
             if (keyParts.Length > 1)
             {
+                if(configObj[keyParts[0]] is null)
+                    configObj[keyParts[0]] = new JsonObject();
                 configObj[keyParts[0]]![keyParts[1]] = value;
             }
             else

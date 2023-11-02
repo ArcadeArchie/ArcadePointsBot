@@ -11,6 +11,10 @@ public partial class CreateRewardWindow : ReactiveWindow<CreateRewardWindowViewM
     {
         InitializeComponent();
 
-        this.WhenActivated(d => d(ViewModel!.CreateTwitchRewardCommand.Subscribe(Close)));
+        this.WhenActivated(d => d(ViewModel!.CreateTwitchRewardCommand.Subscribe(x =>
+        {
+            if (x != null)
+                Close(x);
+        })));
     }
 }

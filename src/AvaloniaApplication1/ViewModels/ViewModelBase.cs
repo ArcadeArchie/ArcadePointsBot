@@ -1,6 +1,12 @@
 ﻿using Avalonia.Threading;
+using DynamicData;
+using DynamicData.Binding;
 using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive.Linq;
 
 namespace AvaloniaApplication1.ViewModels
 {
@@ -20,12 +26,28 @@ namespace AvaloniaApplication1.ViewModels
             get => _isBusy;
             set => Dispatcher.UIThread.Post(() => this.RaiseAndSetIfChanged(ref _isBusy, value));
         }
-        public bool HasError { get; set; }
+        
+        [ObservableAsProperty]
+        public bool HasError { get; }
 
+        public ObservableCollection<Error> Errors { get; } = new();
 
         protected ViewModelBase()
         {
             IsBusyObservable = this.WhenAnyValue(vm => vm.IsBusy, isBusy => !isBusy);
+            Errors
+                .ToObservableChangeSet(x => x)
+                .ToCollection()
+                .Select(x => x.Any())
+                .ToPropertyEx(this, x => x.HasError);
         }
     }
 }
+/*
+ 
+
+        [ObservableAsProperty]
+        public bool HasActions { get; }
+            Actions.ToObservableChangeSet(x => x).ToCollection().Select(x => x.Any()).ToPropertyEx(this, x => x.HasActions);
+ 
+ */

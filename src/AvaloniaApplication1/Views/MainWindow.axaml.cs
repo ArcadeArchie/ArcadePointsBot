@@ -34,5 +34,18 @@ namespace AvaloniaApplication1.Views
                 ViewModel!.ChangeRewardEnabled(reward);
             }
         }
+        void ChangeWorkerStatus(object sender, RoutedEventArgs e)
+        {
+            if (ViewModel!.WorkerStatus == AvaloniaApplication1.WorkerStatus.Running)
+                ViewModel!.StopWorker();
+            if (ViewModel!.WorkerStatus == AvaloniaApplication1.WorkerStatus.Stopped ||
+                ViewModel!.WorkerStatus == AvaloniaApplication1.WorkerStatus.Errored )
+                ViewModel!.StartWorker();
+        }
+        protected override void OnClosing(WindowClosingEventArgs e)
+        {
+            ViewModel?.StopWorker();
+            base.OnClosing(e);
+        }
     }
 }

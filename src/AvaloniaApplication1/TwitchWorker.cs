@@ -1,13 +1,18 @@
-﻿using AvaloniaApplication1.Auth;
+﻿using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
+using AvaloniaApplication1.Auth;
 using AvaloniaApplication1.Data.Abstractions.Repositories;
 using AvaloniaApplication1.Interop.Windows;
 using AvaloniaApplication1.Models;
+using AvaloniaApplication1.Views;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -22,7 +27,7 @@ using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 
 namespace AvaloniaApplication1;
 
-public class TwitchWorker : BackgroundService
+public class TwitchWorker : BackgroundService, INotifyPropertyChanged
 {
     private readonly ILogger<TwitchWorker> _logger;
     private readonly IAuthenticationService _twitchAuthService;
@@ -31,6 +36,30 @@ public class TwitchWorker : BackgroundService
     private readonly TwitchAPI _apiClient;
     private readonly IHostEnvironment _env;
     private bool isLive;
+    private string? currentCategory;
+    private WorkerStatus status = WorkerStatus.Stopped;
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    private string? CurrentCategory
+    {
+        get => currentCategory;
+        set
+        {
+            currentCategory = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CurrentCategory)));
+        }
+    }
+
+    public WorkerStatus Status
+    {
+        get => status; 
+        set
+        {
+            status = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Status)));
+        }
+    }
 
     public TwitchWorker(IAuthenticationService twitchAuthService, ILoggerFactory loggerFactory,
         ILogger<TwitchWorker> logger, IServiceProvider provider, IHostEnvironment env)
@@ -50,6 +79,26 @@ public class TwitchWorker : BackgroundService
         _apiClient.Settings.ClientId = _twitchAuthService.AuthConfig.ClientId;
         _apiClient.Settings.Secret = _twitchAuthService.AuthConfig.ClientSecret;
 
+        PropertyChanged += ChangeActiveRewards;
+    }
+
+    private async void ChangeActiveRewards(object? sender, PropertyChangedEventArgs e)
+    {
+        if (!isLive) return;
+        var toDisableIds = await _rewardRepository
+            .GetBy(x => x.IsEnabled && x.Category != null && x.Category != CurrentCategory).Select(x => x.Id).ToListAsync();
+        var toEnableIds = await _rewardRepository
+            .GetBy(x => !x.IsEnabled && x.Category != null && x.Category == CurrentCategory).Select(x => x.Id).ToListAsync();
+
+        Dispatcher.UIThread.Post(async () =>
+        {
+            if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime &&
+                         lifetime.MainWindow is MainWindow mw)
+            {
+                await mw.ViewModel!.BulkDisable(toDisableIds);
+                await mw.ViewModel!.BulkEnable(toEnableIds);
+            }
+        });
     }
 
     private void OnStreamDown(object? sender, TwitchLib.PubSub.Events.OnStreamDownArgs e)
@@ -197,29 +246,51 @@ public class TwitchWorker : BackgroundService
 
     private void OnLog(object? sender, TwitchLib.PubSub.Events.OnLogArgs e) => _logger.LogDebug("{data}", e.Data);
 
+    #region BackgroundService
+
     protected override async Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _logger.LogInformation("Starting pubsub connection");
         try
         {
-            //int delaySecond = 1;
-            //while (!_twitchAuthService.IsTokenValidAsync() ||
-            //    string.IsNullOrEmpty(_twitchAuthService.AuthConfig.Uid))
-            //{
-            //    if (stoppingToken.IsCancellationRequested) break;
-            //    _logger.LogWarning("Auth or Id token invalid waiting {delay} second before retrying", delaySecond);
-            //    await Task.Delay(1000 * delaySecond, stoppingToken);
-            //    if (delaySecond < 100)
-            //        delaySecond++;
-            //}
-            await _twitchAuthService.EnsureValidTokenAsync();
+            int delaySecond = 1;
+            while (!await _twitchAuthService.IsTokenValidAsync() ||
+                string.IsNullOrEmpty(_twitchAuthService.AuthConfig.Uid))
+            {
+                if (stoppingToken.IsCancellationRequested) break;
+                _logger.LogWarning("Auth or Id token invalid waiting {delay} second before retrying", delaySecond);
+                await Task.Delay(1000 * delaySecond, stoppingToken);
+                if (delaySecond < 100)
+                    delaySecond++;
+                else
+                {
+                    _logger.LogWarning("Max wait time reached force refreshing credentials");
+                    await _twitchAuthService.EnsureValidTokenAsync();
+                    break;
+                }
+            }
             var streams = await _apiClient.Helix.Streams.GetStreamsAsync(
                 userIds: new List<string> { _twitchAuthService.AuthConfig.Uid! },
                 accessToken: _twitchAuthService.AuthConfig.AccessToken);
-            isLive = streams.Streams.Any(x => x.Type == "live");
+            var stream = streams.Streams.FirstOrDefault(x => x.Type == "live");
+            if (stream is not null)
+            {
+                isLive = true;
+                CurrentCategory = stream.GameName;
+            }
             _pubSubClient.ListenToChannelPoints(_twitchAuthService.AuthConfig.Uid);
             _pubSubClient.ListenToVideoPlayback(_twitchAuthService.AuthConfig.Uid);
             _pubSubClient.Connect();
+            Status = WorkerStatus.Running;
+            while (!stoppingToken.IsCancellationRequested)
+            {
+                stream = (await _apiClient.Helix.Streams.GetStreamsAsync(
+                    userIds: new List<string> { _twitchAuthService.AuthConfig.Uid! },
+                    accessToken: _twitchAuthService.AuthConfig.AccessToken)).Streams.FirstOrDefault(x => x.Type == "live");
+                if (stream is not null && !string.Equals(CurrentCategory, stream.GameName))
+                    CurrentCategory = stream.GameName;
+                await Task.Delay(10_0000, stoppingToken);
+            }
         }
 
         catch (TaskCanceledException) { }
@@ -234,18 +305,40 @@ public class TwitchWorker : BackgroundService
             _pubSubClient.OnListenResponse -= OnListenResponse;
             _pubSubClient.OnChannelPointsRewardRedeemed -= OnChannelPointsRewardRedeemed;
             _pubSubClient.Disconnect();
+            Status = WorkerStatus.Errored;
         }
     }
+
+    public override Task StartAsync(CancellationToken cancellationToken)
+    {
+        Status = WorkerStatus.Starting;
+        return base.StartAsync(cancellationToken);
+    }
+
     public override Task StopAsync(CancellationToken cancellationToken)
     {
+        Status = WorkerStatus.Stopping;
         _logger.LogInformation("Stopping pubsub");
-
+        PropertyChanged -= ChangeActiveRewards;
         _pubSubClient.OnLog -= OnLog;
         _pubSubClient.OnStreamUp -= OnStreamUp;
         _pubSubClient.OnStreamDown -= OnStreamDown;
         _pubSubClient.OnListenResponse -= OnListenResponse;
         _pubSubClient.OnChannelPointsRewardRedeemed -= OnChannelPointsRewardRedeemed;
         _pubSubClient.Disconnect();
+        Status = WorkerStatus.Stopped;
         return base.StopAsync(cancellationToken);
     }
+
+    #endregion
+}
+
+
+public enum WorkerStatus
+{
+    Stopped,
+    Stopping,
+    Starting,
+    Running,
+    Errored
 }

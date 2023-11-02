@@ -77,7 +77,7 @@ namespace AvaloniaApplication1.Auth
         {
             if (await IsTokenValidAsync()) return;
 
-            if (string.IsNullOrEmpty(AuthConfig.RefreshToken))
+            if (!string.IsNullOrEmpty(AuthConfig.RefreshToken))
                 await RefreshCredentials();
             else
                 await RequestCredentials();
