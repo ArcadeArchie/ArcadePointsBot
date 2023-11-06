@@ -83,7 +83,18 @@ namespace AvaloniaApplication1.Services
             }
             catch (BadRequestException ex)
             {
-                _logger.LogCritical(ex, "Reward creation failed due to bad credentials, resetting the credentials and restarting the bot is recommended");
+                var msg = await ex.HttpResponse.Content.ReadAsStringAsync();
+                if (msg.Contains("CREATE_CUSTOM_REWARD_DUPLICATE_REWARD"))
+                {
+                    _logger.LogCritical(ex, "Reward update failed due to Duplicate Title, please choose a differend title");
+                    return Result.Failure<TwitchReward>(Errors.TwitchAPI.DupeRewardTitle);
+                }
+                if (msg.Contains("CREATE_CUSTOM_REWARD_TITLE_AUTOMOD_FAILED"))
+                {
+                    _logger.LogCritical(ex, "Reward update failed due to the title not being allowed by twitch, please choose a differend title");
+                    return Result.Failure<TwitchReward>(Errors.TwitchAPI.BadRewardTitle);
+                }
+                _logger.LogCritical(ex, "Reward update failed due to bad credentials, resetting the credentials and restarting the bot is recommended");
                 return Result.Failure<TwitchReward>(Errors.TwitchAPI.BadCredentials);
             }
         }

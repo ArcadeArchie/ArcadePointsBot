@@ -132,17 +132,7 @@ public class TwitchWorker : BackgroundService, INotifyPropertyChanged
         {
             var reward = await _rewardRepository.FindAsync(redemption.Reward.Id);
             if (reward is null)
-            {
-                await _twitchAuthService.EnsureValidTokenAsync();
-                await _apiClient.Helix.ChannelPoints.UpdateRedemptionStatusAsync(
-                _twitchAuthService.AuthConfig.Uid, redemption.Reward.Id,
-                new List<string> { redemption.Id },
-                new UpdateCustomRewardRedemptionStatusRequest
-                {
-                    Status = CustomRewardRedemptionStatus.CANCELED
-                }, accessToken: _twitchAuthService.AuthConfig.AccessToken);
                 return;
-            }
             var actions = new List<RewardAction>()
                 .Concat(reward.KeyboardActions)
                 .Concat(reward.MouseActions).OrderBy(x => x.Index);

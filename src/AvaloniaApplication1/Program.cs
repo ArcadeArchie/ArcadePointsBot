@@ -63,6 +63,7 @@ namespace AvaloniaApplication1
         })
         .ConfigureAppConfiguration(WithApplicationConfiguration)
         .ConfigureServices(WithApplicationServices);
+
         private static void WithApplicationConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
         {
             if (Design.IsDesignMode)

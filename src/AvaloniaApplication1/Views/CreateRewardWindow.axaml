@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AvaloniaApplication1.ViewModels"
+        xmlns:app="using:AvaloniaApplication1"
         xmlns:cc="using:AvaloniaApplication1.Views"
         xmlns:models="using:AvaloniaApplication1.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -14,8 +15,8 @@
              to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
     <vm:CreateRewardWindowViewModel/>
   </Design.DataContext>
-  <Grid RowDefinitions="*, 45">
-    <DockPanel Margin="5">
+  <Grid RowDefinitions="*, 45" ColumnDefinitions="*,145,*">
+    <DockPanel Margin="5" Grid.ColumnSpan="3">
       <Grid ColumnDefinitions="*, *, *, 160" DockPanel.Dock="Top">
         <TextBox Margin="0,0,5,10" VerticalAlignment="Bottom" Watermark="Reward Title" Text="{Binding Title}" MaxHeight="32"/>
         <TextBox Grid.Column="1" Margin="0,0,5,10" VerticalAlignment="Bottom" Watermark="Category aka Game" Text="{Binding Category}" MaxHeight="32"/>
@@ -35,8 +36,15 @@
         </ListBox>
       </Border>
     </DockPanel>
-    <Button Grid.Row="1" Command="{Binding CreateTwitchRewardCommand}" Content="Create Reward" HorizontalAlignment="Center"/>
-    <Button Grid.Row="1" Command="{Binding AddActionCommand}" Margin="0,0,5,0" Content="Add Action" HorizontalAlignment="Right"/>
+    <ListBox Grid.Row="1" ItemsSource="{Binding Errors}" Margin="5" CornerRadius="5" IsVisible="{Binding HasError}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="app:Error">
+              <TextBlock Text="{Binding Message}"/>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+    </ListBox>
+    <Button Grid.Row="1" Grid.Column="1" Command="{Binding CreateTwitchRewardCommand}" Content="Create Reward" HorizontalAlignment="Center"/>
+    <Button Grid.Row="1" Grid.Column="2" Command="{Binding AddActionCommand}" Margin="0,0,5,0" Content="Add Action" HorizontalAlignment="Right"/>
   </Grid>
   
   <Window.Styles>
