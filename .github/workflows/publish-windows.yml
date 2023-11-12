@@ -60,8 +60,6 @@ jobs:
 
     env:
       Solution_Name: ArcadePointsBot.sln                      # Replace with your solution name, i.e. MyWpfApp.sln.
-      ##Test_Project_Path: your-test-project-path                 # Replace with the path to your test project, i.e. MyWpfApp.Tests\MyWpfApp.Tests.csproj.
-      Wap_Project_Directory: publish    # Replace with the Wap project directory relative to the solution, i.e. MyWpfApp.Package.
       
 
     steps:
@@ -99,22 +97,19 @@ jobs:
 
     # Create the app package by building and packaging the Windows Application Packaging project
     - name: Create the app package
-      run: dotnet publish -r win-x64 -f net7.0 --sc -c ${{ matrix.configuration }} -o ${{ env.Wap_Project_Directory }}\ -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false 
+      run: dotnet publish -r win-x64 -f net7.0 --sc -c ${{ matrix.configuration }} -o ${{ matrix.configuration }}\ -p:PublishReadyToRun=true -p:PublishSingleFile=true -p:PublishTrimmed=false 
+      
+    - name: Create Zip
+      uses: vimtor/action-zip@v1.1
+      with:
+        files: ${{ matrix.configuration }}/
+        recursive: true
+        dest: ${{ matrix.configuration }}.zip
 
-    # Remove the pfx
-    #- name: Remove the pfx
-    #  run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
-        
-    # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
-    #- name: Upload build artifacts
-    #  uses: actions/upload-artifact@v3
-    #  with:
-    #    name: App files
-    #    path: ${{ env.Wap_Project_Directory }}/*
     - name: Add files to release
       uses: softprops/action-gh-release@v0.1.15
       with:
         prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}
-        files: ${{ env.Wap_Project_Directory }}/*
+        files: ${{ matrix.configuration }}.zip
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
