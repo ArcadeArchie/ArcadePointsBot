@@ -46,6 +46,10 @@ on:
 jobs:
 
   build:
+    
+    permissions:
+      contents: write
+      discussions: write
 
     strategy:
       matrix:
@@ -100,17 +104,17 @@ jobs:
     # Remove the pfx
     #- name: Remove the pfx
     #  run: Remove-Item -path $env:Wap_Project_Directory\GitHubActionsWorkflow.pfx
-
-    # Create zip
-    - name: Create zip
-      uses: vimtor/action-zip@v1.1
-      with:
-        files: ${{ env.Wap_Project_Directory }}/*
-        dest: Win-x64.zip
-    
+        
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
-    - name: Upload build artifacts
-      uses: actions/upload-artifact@v3
+    #- name: Upload build artifacts
+    #  uses: actions/upload-artifact@v3
+    #  with:
+    #    name: App files
+    #    path: ${{ env.Wap_Project_Directory }}/*
+    - name: Add files to release
+      uses: softprops/action-gh-release@v0.1.15
       with:
-        name: App Package
-        path: Win-x64.zip
+        prerelease: ${{ contains(github.ref, '-rc') || contains(github.ref, '-b') || contains(github.ref, '-a') }}
+        files: ${{ env.Wap_Project_Directory }}/*
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
