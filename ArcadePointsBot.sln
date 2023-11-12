@@ -5,9 +5,18 @@ VisualStudioVersion = 17.8.34205.153
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArcadePointsBot", "src\ArcadePointsBot\ArcadePointsBot.csproj", "{BB6C1FEA-EA74-47AD-AC7A-B619C243DE3C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{041079BB-EDDA-44B4-B168-8AE0AB7825A7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{38BD707A-46DB-4E51-BA1B-6308F176D34E}"
 	ProjectSection(SolutionItems) = preProject
 		.github\workflows\publish-windows.yml = .github\workflows\publish-windows.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github files", "Github files", "{E19BB5EB-5207-4286-953B-7A0C4AD4D609}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEMPLATE", "{DB5979F1-BD0C-48CA-93AA-89345B8491AB}"
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\01_bug_report.yml = .github\ISSUE_TEMPLATE\01_bug_report.yml
+		.github\ISSUE_TEMPLATE\02_blank_issue.md = .github\ISSUE_TEMPLATE\02_blank_issue.md
+		.github\ISSUE_TEMPLATE\config.yml = .github\ISSUE_TEMPLATE\config.yml
 	EndProjectSection
 EndProject
 Global
@@ -23,6 +32,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{38BD707A-46DB-4E51-BA1B-6308F176D34E} = {E19BB5EB-5207-4286-953B-7A0C4AD4D609}
+		{DB5979F1-BD0C-48CA-93AA-89345B8491AB} = {E19BB5EB-5207-4286-953B-7A0C4AD4D609}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {7B0AC4A8-D87F-4C6C-8C61-41335E2AD5C5}
