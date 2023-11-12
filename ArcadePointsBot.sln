@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34205.153
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArcadePointsBot", "src\AvaloniaApplication1\ArcadePointsBot.csproj", "{BB6C1FEA-EA74-47AD-AC7A-B619C243DE3C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArcadePointsBot", "src\ArcadePointsBot\ArcadePointsBot.csproj", "{BB6C1FEA-EA74-47AD-AC7A-B619C243DE3C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
