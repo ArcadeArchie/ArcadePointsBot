@@ -1,4 +1,5 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
+﻿using Avalonia.Collections;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using AvaloniaApplication1.Auth;
 using AvaloniaApplication1.Models;
@@ -11,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -37,8 +37,8 @@ namespace AvaloniaApplication1.ViewModels
             get => isAuthed;
             set => Dispatcher.UIThread.Post(() => this.RaiseAndSetIfChanged(ref isAuthed, value));
         }
-
-        public ObservableCollection<TwitchReward> Rewards { get; set; } = new();
+        private ObservableCollection<TwitchReward> _rewardList = new();
+        public DataGridCollectionView Rewards { get; set; }
 
         public ReactiveCommand<Unit, Unit> CreateRewardCommand { get; set; }
         public ReactiveCommand<TwitchReward, Unit> EditRewardCommand { get; set; }
@@ -85,7 +85,7 @@ namespace AvaloniaApplication1.ViewModels
                 }.ShowDialog<TwitchReward>(desktop.MainWindow!);
                 if (reward != null)
                 {
-                    Rewards.Add(reward);
+                    _rewardList.Add(reward);
                 }
             }
             IsBusy = false;
@@ -101,7 +101,7 @@ namespace AvaloniaApplication1.ViewModels
                     DataContext = new EditRewardViewModel(_rewardService, await _rewardService.GetReward(reward.Id)),
                 }.ShowDialog<TwitchReward>(desktop.MainWindow!);
                 if (res != null)
-                    Rewards.Replace(reward, res);
+                    _rewardList.Replace(reward, res);
             }
             IsBusy = false;
         }
@@ -118,7 +118,10 @@ namespace AvaloniaApplication1.ViewModels
         public async Task LoadRewards()
         {
             IsBusy = true;
-            Rewards.AddRange(await _rewardService.GetAll().ToListAsync());
+            _rewardList = new(await _rewardService.GetAll().ToListAsync());
+            Rewards = new(_rewardList);
+            Rewards.GroupDescriptions.Add(new DataGridPathGroupDescription("Category"));
+            this.RaisePropertyChanged(nameof(Rewards));
             StartWorker();
             IsBusy = false;
         }
@@ -165,7 +168,7 @@ namespace AvaloniaApplication1.ViewModels
         {
             foreach (var id in toDisableIds)
             {
-                var reward = Rewards.FirstOrDefault(x => x.Id == id);
+                var reward = _rewardList.FirstOrDefault(x => x.Id == id);
                 if (reward is null) return;
                 reward.IsEnabled = false;
                 await _rewardService.UpdateReward(reward);
@@ -176,7 +179,7 @@ namespace AvaloniaApplication1.ViewModels
         {
             foreach (var id in toEnableIds)
             {
-                var reward = Rewards.FirstOrDefault(x => x.Id == id);
+                var reward = _rewardList.FirstOrDefault(x => x.Id == id);
                 if (reward is null) return;
                 reward.IsEnabled = true;
                 await _rewardService.UpdateReward(reward);

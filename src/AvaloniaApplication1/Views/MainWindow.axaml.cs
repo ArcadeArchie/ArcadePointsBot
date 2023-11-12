@@ -5,7 +5,6 @@ using Avalonia.Threading;
 using AvaloniaApplication1.Models;
 using AvaloniaApplication1.ViewModels;
 using ReactiveUI;
-using System.Threading.Tasks;
 
 namespace AvaloniaApplication1.Views
 {
