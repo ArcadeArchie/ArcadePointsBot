@@ -15,6 +15,7 @@
                                ChromeWhite="#FF123456" ErrorText="Red"/>
       </FluentTheme.Palettes>
     </FluentTheme>
+    <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml"/>
     <Style Selector="CheckBox:checked /template/ Border#NormalRectangle">
       <Setter Property="Background" Value="White"/>
     </Style>
