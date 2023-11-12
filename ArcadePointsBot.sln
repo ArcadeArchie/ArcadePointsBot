@@ -5,6 +5,11 @@ VisualStudioVersion = 17.8.34205.153
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArcadePointsBot", "src\ArcadePointsBot\ArcadePointsBot.csproj", "{BB6C1FEA-EA74-47AD-AC7A-B619C243DE3C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{041079BB-EDDA-44B4-B168-8AE0AB7825A7}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\publish-windows.yml = .github\workflows\publish-windows.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

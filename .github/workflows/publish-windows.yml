@@ -40,9 +40,8 @@ name: Publish Win x64
 
 on:
   push:
-    branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
+    tags: 
+     - 'v*'
 
 jobs:
 
@@ -104,9 +103,10 @@ jobs:
 
     # Create zip
     - name: Create zip
-      uses: montudor/action-zip@v1
+      uses: vimtor/action-zip@v1.1
       with:
-        args: zip -qq -r Win-x64.zip ${{ env.Wap_Project_Directory }}
+        files: ${{ env.Wap_Project_Directory }}/*
+        dest: Win-x64.zip
     
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload build artifacts
