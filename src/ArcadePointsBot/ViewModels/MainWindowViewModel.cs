@@ -4,7 +4,6 @@ using Avalonia.Threading;
 using AvaloniaApplication1.Auth;
 using AvaloniaApplication1.Models;
 using AvaloniaApplication1.Services;
-using AvaloniaApplication1.Util;
 using AvaloniaApplication1.Views;
 using DynamicData;
 using Microsoft.EntityFrameworkCore;
@@ -12,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -23,7 +23,7 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {
-        private readonly ILogger<MainWindowViewModel> _logger;
+        private readonly IServiceScope _serviceScope;
         private readonly IAuthenticationService _authenticationService;
         private readonly TwitchPointRewardService _rewardService;
         private readonly TwitchWorker _worker;
@@ -38,41 +38,36 @@ namespace AvaloniaApplication1.ViewModels
             set => Dispatcher.UIThread.Post(() => this.RaiseAndSetIfChanged(ref isAuthed, value));
         }
         private ObservableCollection<TwitchReward> _rewardList = new();
-        public DataGridCollectionView Rewards { get; set; }
+        public DataGridCollectionView? Rewards { get; set; }
 
         public ReactiveCommand<Unit, Unit> CreateRewardCommand { get; set; }
         public ReactiveCommand<TwitchReward, Unit> EditRewardCommand { get; set; }
         public ReactiveCommand<TwitchReward, Unit> DeleteRewardCommand { get; set; }
 
-        public MainWindowViewModel(ILogger<MainWindowViewModel> logger,
-            IAuthenticationService authenticationService, TwitchPointRewardService rewardService, TwitchWorker worker)
+        public MainWindowViewModel(IServiceProvider serviceProvider, TwitchWorker worker)
         {
-            _logger = logger;
-            _authenticationService = authenticationService;
+            _serviceScope = serviceProvider.CreateScope();
+            _authenticationService = _serviceScope.ServiceProvider.GetRequiredService<IAuthenticationService>();
+            _rewardService = _serviceScope.ServiceProvider.GetRequiredService<TwitchPointRewardService>();
             StatusText = "Checking Auth status";
+
+            _worker = worker;
+            _worker.PropertyChanged += WorkerPropertyChanged;
+
+
+            
             CreateRewardCommand = ReactiveCommand.CreateFromTask(CreateReward,
                 Observable.CombineLatest(IsBusyObservable, this.WhenAny(x => x.IsAuthed, x => x.Value), (isBusy, isAuthed) => isBusy && isAuthed));
             EditRewardCommand = ReactiveCommand.CreateFromTask<TwitchReward>(EditReward,
                 Observable.CombineLatest(IsBusyObservable, this.WhenAny(x => x.IsAuthed, x => x.Value), (isBusy, isAuthed) => isBusy && isAuthed));
             DeleteRewardCommand = ReactiveCommand.CreateFromTask<TwitchReward>(DeleteReward, IsBusyObservable);
-
-            _rewardService = rewardService;
-            _worker = worker;
-            _worker.PropertyChanged += _worker_PropertyChanged;
         }
 
-        private void _worker_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void WorkerPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName != nameof(_worker.Status)) return;
             WorkerStatus = _worker.Status;
         }
-
-        public MainWindowViewModel() : this(
-            DesignTimeServices.Services.GetRequiredService<ILogger<MainWindowViewModel>>(),
-            DesignTimeServices.Services.GetRequiredService<IAuthenticationService>(),
-            DesignTimeServices.Services.GetRequiredService<TwitchPointRewardService>(),
-            DesignTimeServices.Services.GetRequiredService<TwitchWorker>())
-        { }
 
         private async Task CreateReward()
         {
@@ -81,7 +76,7 @@ namespace AvaloniaApplication1.ViewModels
             {
                 var reward = await new CreateRewardWindow()
                 {
-                    DataContext = Avalonia.Application.Current.CreateInstance<CreateRewardWindowViewModel>(),
+                    DataContext = _serviceScope.ServiceProvider.GetRequiredService<CreateRewardWindowViewModel>(),
                 }.ShowDialog<TwitchReward>(desktop.MainWindow!);
                 if (reward != null)
                 {
@@ -110,7 +105,7 @@ namespace AvaloniaApplication1.ViewModels
         private async Task DeleteReward(TwitchReward reward)
         {
             IsBusy = true;
-            Rewards.Remove(reward);
+            _rewardList.Remove(reward);
             await _rewardService.DeleteReward(reward);
             IsBusy = false;
         }
