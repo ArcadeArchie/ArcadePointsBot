@@ -33,28 +33,28 @@ public partial class App : Application
 {
     public IHost? GlobalHost { get; private set; }
 
-    //private void EnsureDb()
-    //{
-    //    using var scope = Services.CreateScope();
-    //    var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
-    //    var logger = loggerFactory.CreateLogger("App");
-    //    logger.LogInformation("Checking for Db updates");
-    //    try
-    //    {
-    //        using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-    //        var migrations = db.Database.GetPendingMigrations();
-    //        if (migrations.Any())
-    //        {
-    //            logger.LogInformation("Found {count} updates, updating DB", migrations.Count());
-    //            db.Database.Migrate();
-    //        }
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        logger.LogError(ex, "An Error occurred updating the DB");
-    //        throw;
-    //    }
-    //}
+    private void EnsureDb(IServiceProvider services)
+    {
+        using var scope = services.CreateScope();
+        var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+        var logger = loggerFactory.CreateLogger("App");
+        logger.LogInformation("Checking for Db updates");
+        try
+        {
+            using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            var migrations = db.Database.GetPendingMigrations();
+            if (migrations.Any())
+            {
+                logger.LogInformation("Found {count} updates, updating DB", migrations.Count());
+                db.Database.Migrate();
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "An Error occurred updating the DB");
+            throw;
+        }
+    }
 
     public override void Initialize()
     {
@@ -64,7 +64,7 @@ public partial class App : Application
     public override async void OnFrameworkInitializationCompleted()
     {
         GlobalHost = CreateAppBuilder().Build();
-
+        EnsureDb(GlobalHost.Services);
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Line below is needed to remove Avalonia data validation.
