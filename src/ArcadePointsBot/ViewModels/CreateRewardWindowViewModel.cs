@@ -17,6 +17,7 @@ namespace AvaloniaApplication1.ViewModels
 {
     public partial class CreateRewardWindowViewModel : ViewModelBase
     {
+        private readonly IServiceScope _serviceScope;
         private readonly TwitchPointRewardService _pointRewardService;
 
         [Reactive]
@@ -41,9 +42,10 @@ namespace AvaloniaApplication1.ViewModels
         [ObservableAsProperty]
         public bool HasActions { get; }
 
-        public CreateRewardWindowViewModel(TwitchPointRewardService pointRewardService)
+        public CreateRewardWindowViewModel(IServiceProvider serviceProvider)
         {
-            _pointRewardService = pointRewardService;
+            _serviceScope = serviceProvider.CreateScope();
+            _pointRewardService = _serviceScope.ServiceProvider.GetRequiredService<TwitchPointRewardService>();
             Actions.ToObservableChangeSet(x => x).ToCollection().Select(x => x.Any()).ToPropertyEx(this, x => x.HasActions);
             CreateTwitchRewardCommand = ReactiveCommand.CreateFromTask(CreateTwitchReward,
                 Observable.CombineLatest(
@@ -57,10 +59,6 @@ namespace AvaloniaApplication1.ViewModels
             RemoveActionCommand = ReactiveCommand.Create<RewardActionViewModel>(action => Actions.Remove(action));
         }
 
-
-        public CreateRewardWindowViewModel() : this(DesignTimeServices.Services.GetRequiredService<TwitchPointRewardService>())
-        {
-        }
         void DuplicateAction(RewardActionViewModel action)
         {
             var dupedAction = new RewardActionViewModel(Actions.Count)

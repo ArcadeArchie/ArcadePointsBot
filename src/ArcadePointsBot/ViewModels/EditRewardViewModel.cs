@@ -67,10 +67,6 @@ public partial class EditRewardViewModel : ViewModelBase
         RemoveActionCommand = ReactiveCommand.Create<RewardActionViewModel>(action => Actions.Remove(action));
     }
 
-
-    public EditRewardViewModel() : this(DesignTimeServices.Services.GetRequiredService<TwitchPointRewardService>(), new TwitchReward())
-    {
-    }
     void DuplicateAction(RewardActionViewModel action)
     {
         var dupedAction = new RewardActionViewModel(Actions.Count)

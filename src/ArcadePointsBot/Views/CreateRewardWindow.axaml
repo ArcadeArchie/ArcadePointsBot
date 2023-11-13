@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:AvaloniaApplication1.ViewModels"
+        xmlns:local="using:ArcadePointsBot"
         xmlns:app="using:AvaloniaApplication1"
         xmlns:cc="using:AvaloniaApplication1.Views"
         xmlns:models="using:AvaloniaApplication1.Models"
@@ -9,12 +10,9 @@
         mc:Ignorable="d" MinWidth="800" MinHeight="450"
         x:Class="AvaloniaApplication1.CreateRewardWindow"
         x:DataType="vm:CreateRewardWindowViewModel"
-        Title="CreateRewardWindow">
-  <Design.DataContext >
-    <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:CreateRewardWindowViewModel/>
-  </Design.DataContext>
+        Title="CreateRewardWindow"
+        Design.DataContext="{x:Static local:DesignData.CreateRewardWindowViewModel}">
+  
   <Grid RowDefinitions="*, 45" ColumnDefinitions="*,145,*">
     <DockPanel Margin="5" Grid.ColumnSpan="3">
       <Grid ColumnDefinitions="*, *, *, 160" DockPanel.Dock="Top">

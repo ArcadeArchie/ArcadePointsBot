@@ -3,38 +3,32 @@ using Avalonia.Controls.Templates;
 using AvaloniaApplication1.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AvaloniaApplication1
 {
+    public static class ViewLocatorHelpers
+    {
+        public static IServiceCollection AddView<TViewModel, TView>(this IServiceCollection services)
+            where TView : Control, new()
+            where TViewModel : ViewModelBase
+        {
+            services.AddSingleton(new ViewLocator.ViewLocationDescriptor(typeof(TViewModel), () => new TView()));
+            return services;
+        }
+    }
     public class ViewLocator : IDataTemplate
     {
-        private readonly IServiceProvider _serviceProvider;
+        private readonly Dictionary<Type, Func<Control>> _views;
 
-        public ViewLocator(IServiceProvider serviceProvider)
+        public ViewLocator(IEnumerable<ViewLocationDescriptor> descriptors)
         {
-            _serviceProvider = serviceProvider;
+            _views = descriptors.ToDictionary(x => x.ViewModel, x => x.Factory);
         }
 
-        public Control? Build(object? data)
-        {
-            if(data is null)
-                return new TextBlock { Text = "Not Found" };
-
-            var name = data.GetType().FullName!.Replace("ViewModel", "View");
-            var type = Type.GetType(name);
-
-            if (type != null)
-            {
-                var scope = _serviceProvider.CreateScope();
-                return (Control)scope.ServiceProvider.GetRequiredService(type)!;
-            }
-
-            return new TextBlock { Text = "Not Found: " + name };
-        }
-
-        public bool Match(object? data)
-        {
-            return data is ViewModelBase;
-        }
+        public Control Build(object? param) => _views[param!.GetType()]();
+        public bool Match(object? param) => param is not null && _views.ContainsKey(param.GetType());
+        public record ViewLocationDescriptor(Type ViewModel, Func<Control> Factory);
     }
 }

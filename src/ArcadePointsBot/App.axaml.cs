@@ -31,20 +31,11 @@ using System.Threading.Tasks;
 namespace AvaloniaApplication1;
 public partial class App : Application
 {
-    private readonly IServiceProvider _services;
+    public IHost? GlobalHost { get; private set; }
 
-
-    public App(IServiceProvider services)
+    private void EnsureDb(IServiceProvider services)
     {
-        _services = services;
-        if (!Design.IsDesignMode)
-            EnsureDb();
-        RxApp.DefaultExceptionHandler = _services.GetRequiredService<IObserver<Exception>>();
-    }
-
-    private void EnsureDb()
-    {
-        using var scope = _services.CreateScope();
+        using var scope = services.CreateScope();
         var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
         var logger = loggerFactory.CreateLogger("App");
         logger.LogInformation("Checking for Db updates");
@@ -67,14 +58,13 @@ public partial class App : Application
 
     public override void Initialize()
     {
-        AvaloniaXamlLoader.Load(_services, this);
-
-        Resources[typeof(IServiceProvider)] = _services;
-        DataTemplates.Add(_services.GetRequiredService<ViewLocator>());
+        AvaloniaXamlLoader.Load(this);
     }
 
-    public override void OnFrameworkInitializationCompleted()
+    public override async void OnFrameworkInitializationCompleted()
     {
+        GlobalHost = CreateAppBuilder().Build();
+        EnsureDb(GlobalHost.Services);
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Line below is needed to remove Avalonia data validation.
@@ -83,10 +73,91 @@ public partial class App : Application
 
             desktop.MainWindow = new MainWindow
             {
-                DataContext = this.CreateInstance<MainWindowViewModel>(),
+                DataContext = GlobalHost.Services.GetRequiredService<MainWindowViewModel>(),
+            };
+            desktop.Exit += (_, _) =>
+            {
+                GlobalHost.StopAsync().GetAwaiter().GetResult();
+                GlobalHost.Dispose();
+                GlobalHost = null;
             };
         }
+        
+        DataTemplates.Add(GlobalHost.Services.GetRequiredService<ViewLocator>());
 
         base.OnFrameworkInitializationCompleted();
+
+        await GlobalHost.StartAsync();
     }
+
+    
+        public static IHostBuilder CreateAppBuilder() => Host
+        .CreateDefaultBuilder(Environment.GetCommandLineArgs())
+        .UseSerilog((ctx, svc, cfg) =>
+        {
+            cfg
+            .ReadFrom.Configuration(ctx.Configuration)
+            .ReadFrom.Services(svc)
+            .Enrich.FromLogContext();
+        })
+        .ConfigureAppConfiguration(WithApplicationConfiguration)
+        .ConfigureServices(WithApplicationServices);
+
+        private static void WithApplicationConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
+        {
+            if (Design.IsDesignMode)
+                return;
+            configurationBuilder.Sources.Clear();
+            configurationBuilder
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .Add<WritableJsonConfigurationSource>(s =>
+                {
+                    s.Path = "appsettings.json";
+                    s.Optional = false;
+                    s.ReloadOnChange = true;
+                    s.FileProvider = null;
+                    s.ResolveFileProvider();
+                })
+                .AddJsonFile("appsettings.Development.json", true, true);
+
+            if (context.HostingEnvironment.IsDevelopment())
+            {
+                configurationBuilder.AddUserSecrets(Assembly.GetExecutingAssembly());
+            }
+
+            configurationBuilder.AddEnvironmentVariables();
+        }
+        private static void WithApplicationServices(HostBuilderContext context, IServiceCollection services)
+        {            
+            services.AddDbContext<ApplicationDbContext>(options =>
+            {
+                var dbPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ArcadePointsBot.db");
+                options.UseSqlite($"Data Source={dbPath}");
+            });
+
+            services.AddOptions<TwitchAuthConfig>().BindConfiguration("TwitchAuthConfig");
+
+            services.Configure<TwitchAuthConfig>(options =>
+            {
+                var rawConfig = context.Configuration;
+                options.PropertyChanged += (o, e) =>
+                {
+                    if (e is not PropertyChangedEventArgsEx args) throw new InvalidOperationException();
+                    rawConfig["TwitchAuthConfig:" + args.PropertyName!] = args.Value?.ToString();
+                };
+            });
+
+            services.AddSingleton<IObserver<Exception>, GlobalRxExceptionHandler>();
+            services.AddSingleton<IAuthenticationService, TwitchAuthenticationService>();
+            services.AddScoped<TwitchPointRewardService>();
+
+            services.AddScoped(typeof(IEntityRepository<,>), typeof(DataEntityRepository<,>));
+            services.AddScoped<IRewardRepository, RewardRepository>();
+
+            services.AddSingleton<TwitchWorker>();
+
+            services.AddTransient<ViewLocator>();
+            services.AddTransient<MainWindowViewModel>();
+            services.AddTransient<CreateRewardWindowViewModel>();
+        }
 }
