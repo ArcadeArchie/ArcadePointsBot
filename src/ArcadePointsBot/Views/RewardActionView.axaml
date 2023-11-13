@@ -9,12 +9,7 @@
              mc:Ignorable="d" d:DesignWidth="820" MinHeight="50" MinWidth="400"
              x:Class="AvaloniaApplication1.Views.RewardActionView"
              x:DataType="vm:RewardActionViewModel">
-
-  <Design.DataContext >
-    <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:RewardActionViewModel />
-  </Design.DataContext>
+  
   <Border BorderBrush="White" BorderThickness="1" CornerRadius="5">
     <DockPanel>
       <ComboBox Name="ActionSelect" VerticalAlignment="Center" Margin="5,0,10,0"
@@ -56,14 +51,6 @@
       <Grid></Grid>
     </DockPanel>
   </Border>
-  <UserControl.Resources>
-    <models:KeyboardActionType x:Key="ActionType1">Press</models:KeyboardActionType>
-    <models:ActionType x:Key="KeyboardAction">Keyboard</models:ActionType>
-    <models:ActionType x:Key="MouseAction">Mouse</models:ActionType>
-    <StreamGeometry x:Key="chevron_down_regular">M8.36612 16.1161C7.87796 16.6043 7.87796 17.3957 8.36612 17.8839L23.1161 32.6339C23.6043 33.122 24.3957 33.122 24.8839 32.6339L39.6339 17.8839C40.122 17.3957 40.122 16.6043 39.6339 16.1161C39.1457 15.628 38.3543 15.628 37.8661 16.1161L24 29.9822L10.1339 16.1161C9.64573 15.628 8.85427 15.628 8.36612 16.1161Z</StreamGeometry>
-    <StreamGeometry x:Key="chevron_up_regular">M39.6339 31.8839C39.1457 32.372 38.3543 32.372 37.8661 31.8839L24 18.0178L10.1339 31.8839C9.64573 32.372 8.85427 32.372 8.36612 31.8839C7.87796 31.3957 7.87796 30.6043 8.36612 30.1161L23.1161 15.3661C23.6043 14.878 24.3957 14.878 24.8839 15.3661L39.6339 30.1161C40.122 30.6043 40.122 31.3957 39.6339 31.8839Z</StreamGeometry>
-    <StreamGeometry x:Key="line_horizontal_1_regular">M2 9.5C2 9.22386 2.22386 9 2.5 9H17.5C17.7761 9 18 9.22386 18 9.5C18 9.77614 17.7761 10 17.5 10H2.5C2.22386 10 2 9.77614 2 9.5Z</StreamGeometry>
-  </UserControl.Resources>
 
   <i:Interaction.Behaviors>
     <ia:DataTriggerBehavior Binding="{Binding ActionKeyType}" ComparisonCondition="NotEqual" Value="{StaticResource ActionType1}">

@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:ArcadePointsBot"
         xmlns:vm="using:AvaloniaApplication1.ViewModels"
         xmlns:mm="using:AvaloniaApplication1.Models"
         xmlns:app="using:AvaloniaApplication1"
@@ -12,40 +13,31 @@
         x:Class="AvaloniaApplication1.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Icon="/Assets/avalonia-logo.ico"
-        Title="AvaloniaApplication1">
-  <Design.DataContext >
-    <!-- This only sets the DataContext for the previewer in an IDE,
-             to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainWindowViewModel StatusText="Auth OK"/>
-  </Design.DataContext>
-  
-  <Window.Resources>
-    <app:WorkerStatus x:Key="WorkerStatus1">Stopped</app:WorkerStatus>
-    <app:WorkerStatus x:Key="WorkerStatusErr">Errored</app:WorkerStatus>
-    <app:WorkerStatus x:Key="WorkerStatusStart">Starting</app:WorkerStatus>
-    <app:WorkerStatus x:Key="WorkerStatusRunning">Running</app:WorkerStatus>
-  </Window.Resources>
-  
+        Title="AvaloniaApplication1"
+        Design.DataContext="{x:Static local:DesignData.MainWindowViewModel}">
+
   <Grid RowDefinitions="*,*,*,45">
     <DataGrid Grid.RowSpan="3" Margin="5" CornerRadius="5" Name="RewardGrid" ItemsSource="{Binding Rewards}"
               AutoGenerateColumns="False" IsReadOnly="True">
       <DataGrid.Columns>
-        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="Name" 
+        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="Name"
                             Width="200" Binding="{Binding Title}"/>
-        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="Category" 
+        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="Category"
                             Width="*" Binding="{Binding Category}"/>
-        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="Cost" 
+        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="Cost"
                             Width="100" Binding="{Binding Cost}"/>
         <DataGridTemplateColumn Width="*">
           <DataTemplate x:DataType="mm:TwitchReward">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
               <CheckBox IsChecked="{Binding IsEnabled}" Margin="5,0" Click="OnEnabledChanged">Enabled</CheckBox>
-              <Button Content="Edit" Margin="5,0"
-                      Command="{ReflectionBinding Path=DataContext.EditRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                      CommandParameter="{Binding }"/>
-              <Button Content="Delete" Margin="5,0"
-                      Command="{ReflectionBinding Path=DataContext.DeleteRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                      CommandParameter="{Binding }" />
+              <StackPanel Orientation="Horizontal" Margin="5">
+                <Button Content="Edit" Margin="0" CornerRadius="10,0,0,10" BorderThickness="0"
+                        Command="{ReflectionBinding Path=DataContext.EditRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding }"/>
+                <Button Content="Delete" Margin="0" CornerRadius="0,10,10,0" BorderThickness="0"
+                        Command="{ReflectionBinding Path=DataContext.DeleteRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                        CommandParameter="{Binding }" />
+              </StackPanel>
             </StackPanel>
           </DataTemplate>
         </DataGridTemplateColumn>
@@ -86,7 +78,7 @@
       <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="BorderBrush" Value="Red"/>
       <ia:ChangePropertyAction TargetObject="{Binding #Status}" PropertyName="Background" Value="DarkRed"/>
     </ia:DataTriggerBehavior>
-    
+
     <ia:DataTriggerBehavior Binding="{Binding WorkerStatus}" ComparisonCondition="Equal" Value="{StaticResource WorkerStatusErr}">
       <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatusTextblock}" PropertyName="Foreground" Value="White"/>
       <ia:ChangePropertyAction TargetObject="{Binding #WorkerStatusLabel}" PropertyName="Foreground" Value="White"/>
