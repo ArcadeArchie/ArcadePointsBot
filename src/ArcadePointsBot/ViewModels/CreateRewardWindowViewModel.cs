@@ -1,6 +1,6 @@
-﻿using AvaloniaApplication1.Models;
-using AvaloniaApplication1.Services;
-using AvaloniaApplication1.Util;
+﻿using ArcadePointsBot.Models;
+using ArcadePointsBot.Services;
+using ArcadePointsBot.Util;
 using DynamicData;
 using DynamicData.Binding;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +13,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.ViewModels
+namespace ArcadePointsBot.ViewModels
 {
     public partial class CreateRewardWindowViewModel : ViewModelBase
     {

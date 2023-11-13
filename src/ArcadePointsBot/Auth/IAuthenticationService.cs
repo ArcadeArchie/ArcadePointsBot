@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Auth;
+namespace ArcadePointsBot.Auth;
 
 public interface IAuthenticationService
 {

@@ -1,12 +1,12 @@
 ﻿using Avalonia.Input;
-using AvaloniaApplication1.Util;
+using ArcadePointsBot.Util;
 using ReactiveUI.Fody.Helpers;
 using ReactiveUI;
 using System;
 using System.Collections;
-using AvaloniaApplication1.ViewModels;
+using ArcadePointsBot.ViewModels;
 
-namespace AvaloniaApplication1.Models;
+namespace ArcadePointsBot.Models;
 
 public class KeyboardRewardAction : RewardAction<KeyboardActionType, Key>
 {

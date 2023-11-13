@@ -1,7 +1,7 @@
-﻿using AvaloniaApplication1.Auth;
-using AvaloniaApplication1.Data.Abstractions.Repositories;
-using AvaloniaApplication1.Models;
-using AvaloniaApplication1.ViewModels;
+﻿using ArcadePointsBot.Auth;
+using ArcadePointsBot.Data.Abstractions.Repositories;
+using ArcadePointsBot.Models;
+using ArcadePointsBot.ViewModels;
 using DynamicData;
 using Microsoft.Extensions.Logging;
 using System;
@@ -18,7 +18,7 @@ using TwitchLib.Api.Helix.Models.ChannelPoints.UpdateCustomReward;
 using TwitchLib.Api.Helix.Models.ChannelPoints.UpdateCustomRewardRedemptionStatus;
 using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 
-namespace AvaloniaApplication1.Services
+namespace ArcadePointsBot.Services
 {
     public class TwitchPointRewardService
     {

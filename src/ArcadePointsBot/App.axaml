@@ -1,17 +1,16 @@
 <Application xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             x:Class="AvaloniaApplication1.App"
-             xmlns:oldLocal="using:AvaloniaApplication1"
+             x:Class="ArcadePointsBot.App"
              xmlns:local="using:ArcadePointsBot"
-             xmlns:models="using:AvaloniaApplication1.Models"
+             xmlns:models="using:ArcadePointsBot.Models"
              RequestedThemeVariant="Dark">
   <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
   <Application.Resources>
-    <oldLocal:WorkerStatus x:Key="WorkerStatus1">Stopped</oldLocal:WorkerStatus>
-    <oldLocal:WorkerStatus x:Key="WorkerStatusErr">Errored</oldLocal:WorkerStatus>
-    <oldLocal:WorkerStatus x:Key="WorkerStatusStart">Starting</oldLocal:WorkerStatus>
-    <oldLocal:WorkerStatus x:Key="WorkerStatusRunning">Running</oldLocal:WorkerStatus>
+    <local:WorkerStatus x:Key="WorkerStatus1">Stopped</local:WorkerStatus>
+    <local:WorkerStatus x:Key="WorkerStatusErr">Errored</local:WorkerStatus>
+    <local:WorkerStatus x:Key="WorkerStatusStart">Starting</local:WorkerStatus>
+    <local:WorkerStatus x:Key="WorkerStatusRunning">Running</local:WorkerStatus>
 
     <models:KeyboardActionType x:Key="ActionType1">Press</models:KeyboardActionType>
     <models:ActionType x:Key="KeyboardAction">Keyboard</models:ActionType>

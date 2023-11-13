@@ -1,6 +1,6 @@
-﻿using AvaloniaApplication1.Data.Abstractions;
-using AvaloniaApplication1.Models;
-using AvaloniaApplication1.ViewModels;
+﻿using ArcadePointsBot.Data.Abstractions;
+using ArcadePointsBot.Models;
+using ArcadePointsBot.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Data.Contexts;
+namespace ArcadePointsBot.Data.Contexts;
 
 public class ApplicationDbContext : DbContext, IUnitOfWork
 {

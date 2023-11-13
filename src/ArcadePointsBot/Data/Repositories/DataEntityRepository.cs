@@ -1,6 +1,6 @@
-﻿using AvaloniaApplication1.Data.Abstractions;
-using AvaloniaApplication1.Data.Abstractions.Repositories;
-using AvaloniaApplication1.Data.Contexts;
+﻿using ArcadePointsBot.Data.Abstractions;
+using ArcadePointsBot.Data.Abstractions.Repositories;
+using ArcadePointsBot.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Data.Repositories
+namespace ArcadePointsBot.Data.Repositories
 {
     internal class DataEntityRepository<T, TId> : IEntityRepository<T, TId> where T : class, IEntity<TId>
     {

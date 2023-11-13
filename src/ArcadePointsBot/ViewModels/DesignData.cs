@@ -1,7 +1,7 @@
 ﻿using Avalonia;
-using AvaloniaApplication1;
-using AvaloniaApplication1.Services;
-using AvaloniaApplication1.ViewModels;
+using ArcadePointsBot;
+using ArcadePointsBot.Services;
+using ArcadePointsBot.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using System.Threading;
@@ -21,5 +21,5 @@ public static class DesignData
         ((App)Application.Current!).GlobalHost!.Services.GetRequiredService<CreateRewardWindowViewModel>();
 
     public static EditRewardViewModel EditRewardViewModel { get; } = new EditRewardViewModel(null, 
-        new AvaloniaApplication1.Models.TwitchReward());
+        new ArcadePointsBot.Models.TwitchReward());
 }

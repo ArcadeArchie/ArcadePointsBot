@@ -8,7 +8,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive.Linq;
 
-namespace AvaloniaApplication1.ViewModels
+namespace ArcadePointsBot.ViewModels
 {
     public partial class ViewModelBase : ReactiveObject
     {

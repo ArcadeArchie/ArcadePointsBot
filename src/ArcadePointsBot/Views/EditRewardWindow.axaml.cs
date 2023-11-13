@@ -1,10 +1,10 @@
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
-using AvaloniaApplication1.ViewModels;
+using ArcadePointsBot.ViewModels;
 using ReactiveUI;
 using System;
 
-namespace AvaloniaApplication1.Views
+namespace ArcadePointsBot.Views
 {
     public partial class EditRewardWindow : ReactiveWindow<EditRewardViewModel>
     {

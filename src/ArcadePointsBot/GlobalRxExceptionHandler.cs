@@ -6,7 +6,7 @@ using System;
 using System.Diagnostics;
 using System.Reactive.Concurrency;
 
-namespace AvaloniaApplication1
+namespace ArcadePointsBot
 {
     internal class GlobalRxExceptionHandler : IObserver<Exception>
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1;
+namespace ArcadePointsBot;
 
 /// <summary>
 /// Represents a result of some operation, with status information and possibly an error.

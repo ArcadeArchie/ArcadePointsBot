@@ -2,17 +2,21 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
-using AvaloniaApplication1.Models;
-using AvaloniaApplication1.ViewModels;
+using ArcadePointsBot.Models;
+using ArcadePointsBot.ViewModels;
 using ReactiveUI;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using System.Globalization;
 
-namespace AvaloniaApplication1.Views
+namespace ArcadePointsBot.Views
 {
     public partial class MainWindow : ReactiveWindow<MainWindowViewModel>
     {
         public MainWindow()
         {
             InitializeComponent();
+
             this.WhenActivated(disposables =>
             {
 
@@ -35,10 +39,10 @@ namespace AvaloniaApplication1.Views
         }
         void ChangeWorkerStatus(object sender, RoutedEventArgs e)
         {
-            if (ViewModel!.WorkerStatus == AvaloniaApplication1.WorkerStatus.Running)
+            if (ViewModel!.WorkerStatus == ArcadePointsBot.WorkerStatus.Running)
                 ViewModel!.StopWorker();
-            if (ViewModel!.WorkerStatus == AvaloniaApplication1.WorkerStatus.Stopped ||
-                ViewModel!.WorkerStatus == AvaloniaApplication1.WorkerStatus.Errored )
+            if (ViewModel!.WorkerStatus == ArcadePointsBot.WorkerStatus.Stopped ||
+                ViewModel!.WorkerStatus == ArcadePointsBot.WorkerStatus.Errored )
                 ViewModel!.StartWorker();
         }
         protected override void OnClosing(WindowClosingEventArgs e)

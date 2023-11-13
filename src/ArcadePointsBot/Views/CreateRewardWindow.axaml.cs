@@ -1,9 +1,9 @@
 using Avalonia.ReactiveUI;
-using AvaloniaApplication1.ViewModels;
+using ArcadePointsBot.ViewModels;
 using ReactiveUI;
 using System;
 
-namespace AvaloniaApplication1;
+namespace ArcadePointsBot;
 
 public partial class CreateRewardWindow : ReactiveWindow<CreateRewardWindowViewModel>
 {

@@ -1,13 +1,13 @@
 ﻿using Avalonia.Input;
-using AvaloniaApplication1.Data.Abstractions;
-using AvaloniaApplication1.Util;
-using AvaloniaApplication1.ViewModels;
+using ArcadePointsBot.Data.Abstractions;
+using ArcadePointsBot.Util;
+using ArcadePointsBot.ViewModels;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System;
 using System.Collections;
 
-namespace AvaloniaApplication1.Models;
+namespace ArcadePointsBot.Models;
 public abstract class RewardAction : IEntity<string> 
 {
     public string Id { get; set; } = null!;

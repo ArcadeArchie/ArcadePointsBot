@@ -1,28 +1,9 @@
 ﻿using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.ReactiveUI;
-using AvaloniaApplication1.Auth;
-using AvaloniaApplication1.Config;
-using AvaloniaApplication1.Data.Abstractions.Repositories;
-using AvaloniaApplication1.Data.Contexts;
-using AvaloniaApplication1.Data.Repositories;
-using AvaloniaApplication1.Services;
-using AvaloniaApplication1.ViewModels;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Serilog;
 using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
+using System.Globalization;
 
-namespace AvaloniaApplication1
+namespace ArcadePointsBot
 {
     internal class Program
     {
@@ -31,8 +12,9 @@ namespace AvaloniaApplication1
         // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
         // yet and stuff might break.
         [STAThread]
-        public static void Main(string[] args) => BuildAvaloniaApp()
-        .StartWithClassicDesktopLifetime(args);
+        public static void Main(string[] args) => 
+            BuildAvaloniaApp()
+            .StartWithClassicDesktopLifetime(args);
 
         // Avalonia configuration, don't remove; also used by visual designer.
         public static AppBuilder BuildAvaloniaApp()
