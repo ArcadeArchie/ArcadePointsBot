@@ -6,21 +6,25 @@
         xmlns:models="using:ArcadePointsBot.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:assets="clr-namespace:ArcadePointsBot.Resources"
         mc:Ignorable="d" MinWidth="800" MinHeight="450"
         x:Class="ArcadePointsBot.Views.EditRewardWindow"
         x:DataType="vm:EditRewardViewModel"
-        Title="EditRewardWindow"
+        Title="{x:Static assets:L10n.Edit_Window}"
         Design.DataContext="{x:Static local:DesignData.EditRewardViewModel}">
   <Grid RowDefinitions="*, 45" ColumnDefinitions="*,145,*">
     <DockPanel Margin="5" Grid.ColumnSpan="3">
       <Grid ColumnDefinitions="*,*, *, 160" DockPanel.Dock="Top">
-        <TextBox Margin="0,0,5,10" VerticalAlignment="Bottom" Watermark="Reward Title" Text="{Binding Title}" MaxHeight="32"/>
-        <TextBox Grid.Column="1" Margin="0,0,5,10" VerticalAlignment="Bottom" Watermark="Category aka Game" Text="{Binding Category}" MaxHeight="32"/>
+        <TextBox Margin="0,0,5,10" VerticalAlignment="Bottom" 
+                 Watermark="{x:Static assets:L10n.Create_Title}" Text="{Binding Title}" MaxHeight="32"/>
+        <TextBox Grid.Column="1" Margin="0,0,5,10" VerticalAlignment="Bottom" 
+                 Watermark="{x:Static assets:L10n.Create_Category}" Text="{Binding Category}" MaxHeight="32"/>
         <StackPanel Grid.Column="2" Margin="5,0,5,10">
           <Label>Reward Cost</Label>
-          <NumericUpDown Watermark="Reward Cost" Value="{Binding Cost}" Minimum="10" Increment="1" />
+          <NumericUpDown Watermark="{x:Static assets:L10n.Create_Cost}" Value="{Binding Cost}" Minimum="10" Increment="1" />
         </StackPanel>
-        <CheckBox Grid.Column="3" Padding="8,0,0,1" VerticalAlignment="Bottom" Margin="5,0,0,10" IsChecked="{Binding RequireInput}">Require User Input</CheckBox>
+        <CheckBox Grid.Column="3" Padding="8,0,0,1" VerticalAlignment="Bottom" Margin="5,0,0,10" IsChecked="{Binding RequireInput}"
+                  Content="{x:Static assets:L10n.Create_RequireInput}"/>
       </Grid>
       <Border BorderBrush="#99FFFFFF" BorderThickness="1" CornerRadius="5" Grid.ColumnSpan="3">
         <ListBox ItemsSource="{Binding Actions}">
@@ -39,8 +43,10 @@
             </DataTemplate>
           </ListBox.ItemTemplate>
     </ListBox>
-    <Button Grid.Row="1" Grid.Column="1" Command="{Binding EditTwitchRewardCommand}" Content="Save changes" HorizontalAlignment="Center"/>
-    <Button Grid.Row="1" Grid.Column="2" Command="{Binding AddActionCommand}" Margin="0,0,5,0" Content="Add Action" HorizontalAlignment="Right"/>
+    <Button Grid.Row="1" Grid.Column="1" Command="{Binding EditTwitchRewardCommand}" MinWidth="155" HorizontalContentAlignment="Center"
+            Content="{x:Static assets:L10n.Edit_SaveBtn}" HorizontalAlignment="Center"/>
+    <Button Grid.Row="1" Grid.Column="2" Command="{Binding AddActionCommand}" Margin="0,0,5,0" 
+            Content="{x:Static assets:L10n.Create_AddBtn}" HorizontalAlignment="Right"/>
   </Grid>
 
   <Window.Styles>

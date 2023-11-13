@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:assets="clr-namespace:ArcadePointsBot.Resources"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
              xmlns:models="using:ArcadePointsBot.Models"
@@ -9,27 +10,27 @@
              mc:Ignorable="d" d:DesignWidth="820" MinHeight="50" MinWidth="400"
              x:Class="ArcadePointsBot.Views.RewardActionView"
              x:DataType="vm:RewardActionViewModel">
-  
+
   <Border BorderBrush="White" BorderThickness="1" CornerRadius="5">
     <DockPanel>
       <ComboBox Name="ActionSelect" VerticalAlignment="Center" Margin="5,0,10,0"
-                PlaceholderText="Action Type" ItemsSource="{Binding ActionValues}"
+                PlaceholderText="{x:Static assets:L10n.Action_Type}" ItemsSource="{Binding ActionValues}"
                 SelectedItem="{Binding ActionType}"/>
       <StackPanel Name="Keyboard" Orientation="Horizontal" IsVisible="False">
         <ComboBox VerticalAlignment="Center" Margin="0,0,10,0"
-                  PlaceholderText="Key Action Type" ItemsSource="{Binding KeyboardActionValues}"
+                  PlaceholderText="{x:Static assets:L10n.Action_Key_Type}" ItemsSource="{Binding KeyboardActionValues}"
                   SelectedItem="{Binding ActionKeyType}"/>
         <NumericUpDown VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="150"
-                       Name="Duration" Watermark="Duration milliseconds" Minimum="100" Increment="1" Value="{Binding Duration}"/>
-        <ComboBox VerticalAlignment="Center" PlaceholderText="Keyboard key" ItemsSource="{Binding KeyboardValues}" SelectedItem="{Binding ActionKey}"/>
+                       Name="Duration" Watermark="{x:Static assets:L10n.Action_Duration}" Minimum="100" Increment="1" Value="{Binding Duration}"/>
+        <ComboBox VerticalAlignment="Center" PlaceholderText="{x:Static assets:L10n.Action_Keyboard_Key}" ItemsSource="{Binding KeyboardValues}" SelectedItem="{Binding ActionKey}"/>
       </StackPanel>
       <StackPanel Name="Mouse" Orientation="Horizontal" IsVisible="False">
         <ComboBox VerticalAlignment="Center" Margin="0,0,10,0"
-                  PlaceholderText="Mouse Action Type" ItemsSource="{Binding MouseActionValues}"
+                  PlaceholderText="{x:Static assets:L10n.Action_Mouse_Action}" ItemsSource="{Binding MouseActionValues}"
                   SelectedItem="{Binding ActionKeyType}"/>
         <NumericUpDown VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="150"
-                       Name="DurationMouse" Watermark="Duration milliseconds" Minimum="100" Increment="1" Value="{Binding Duration}"/>
-        <ComboBox VerticalAlignment="Center" PlaceholderText="Mouse Button" ItemsSource="{Binding MouseValues}" SelectedItem="{Binding ActionKey}"/>
+                       Name="DurationMouse" Watermark="{x:Static assets:L10n.Action_Duration}" Minimum="100" Increment="1" Value="{Binding Duration}"/>
+        <ComboBox VerticalAlignment="Center" PlaceholderText="{x:Static assets:L10n.Action_Mouse_Key}" ItemsSource="{Binding MouseValues}" SelectedItem="{Binding ActionKey}"/>
       </StackPanel>
 
       <Button DockPanel.Dock="Right" Margin="0,5,5,5"
@@ -45,7 +46,7 @@
           <PathIcon Data="{StaticResource chevron_down_regular}"/>
         </Button>
       </StackPanel>
-      <Button DockPanel.Dock="Right" Margin="0,0,5,0" Content="Duplicate"
+      <Button DockPanel.Dock="Right" Margin="0,0,5,0" Content="{x:Static assets:L10n.Action_Duplicate}"
                       Command="{ReflectionBinding Path=DataContext.DupeActionCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                       CommandParameter="{Binding }"/>
       <Grid></Grid>

@@ -59,6 +59,11 @@ public partial class App : Application
     {
         GlobalHost = CreateAppBuilder().Build();
         EnsureDb(GlobalHost.Services);
+
+
+        var lang = GlobalHost.Services.GetRequiredService<IConfiguration>().GetValue<string>("lang");
+        ArcadePointsBot.Resources.L10n.Culture = new System.Globalization.CultureInfo(lang ?? "en-US");
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             // Line below is needed to remove Avalonia data validation.
@@ -76,7 +81,7 @@ public partial class App : Application
                 GlobalHost = null;
             };
         }
-        
+
         DataTemplates.Add(GlobalHost.Services.GetRequiredService<ViewLocator>());
 
         base.OnFrameworkInitializationCompleted();
@@ -84,74 +89,74 @@ public partial class App : Application
         await GlobalHost.StartAsync();
     }
 
-    
-        public static IHostBuilder CreateAppBuilder() => Host
-        .CreateDefaultBuilder(Environment.GetCommandLineArgs())
-        .UseSerilog((ctx, svc, cfg) =>
+
+    public static IHostBuilder CreateAppBuilder() => Host
+    .CreateDefaultBuilder(Environment.GetCommandLineArgs())
+    .UseSerilog((ctx, svc, cfg) =>
+    {
+        cfg
+        .ReadFrom.Configuration(ctx.Configuration)
+        .ReadFrom.Services(svc)
+        .Enrich.FromLogContext();
+    })
+    .ConfigureAppConfiguration(WithApplicationConfiguration)
+    .ConfigureServices(WithApplicationServices);
+
+    private static void WithApplicationConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
+    {
+        if (Design.IsDesignMode)
+            return;
+        configurationBuilder.Sources.Clear();
+        configurationBuilder
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .Add<WritableJsonConfigurationSource>(s =>
+            {
+                s.Path = "appsettings.json";
+                s.Optional = false;
+                s.ReloadOnChange = true;
+                s.FileProvider = null;
+                s.ResolveFileProvider();
+            })
+            .AddJsonFile("appsettings.Development.json", true, true);
+
+        if (context.HostingEnvironment.IsDevelopment())
         {
-            cfg
-            .ReadFrom.Configuration(ctx.Configuration)
-            .ReadFrom.Services(svc)
-            .Enrich.FromLogContext();
-        })
-        .ConfigureAppConfiguration(WithApplicationConfiguration)
-        .ConfigureServices(WithApplicationServices);
+            configurationBuilder.AddUserSecrets(Assembly.GetExecutingAssembly());
+        }
 
-        private static void WithApplicationConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
+        configurationBuilder.AddEnvironmentVariables();
+    }
+    private static void WithApplicationServices(HostBuilderContext context, IServiceCollection services)
+    {
+        services.AddDbContext<ApplicationDbContext>(options =>
         {
-            if (Design.IsDesignMode)
-                return;
-            configurationBuilder.Sources.Clear();
-            configurationBuilder
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .Add<WritableJsonConfigurationSource>(s =>
-                {
-                    s.Path = "appsettings.json";
-                    s.Optional = false;
-                    s.ReloadOnChange = true;
-                    s.FileProvider = null;
-                    s.ResolveFileProvider();
-                })
-                .AddJsonFile("appsettings.Development.json", true, true);
+            var dbPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ArcadePointsBot.db");
+            options.UseSqlite($"Data Source={dbPath}");
+        });
 
-            if (context.HostingEnvironment.IsDevelopment())
+        services.AddOptions<TwitchAuthConfig>().BindConfiguration("TwitchAuthConfig");
+
+        services.Configure<TwitchAuthConfig>(options =>
+        {
+            var rawConfig = context.Configuration;
+            options.PropertyChanged += (o, e) =>
             {
-                configurationBuilder.AddUserSecrets(Assembly.GetExecutingAssembly());
-            }
+                if (e is not PropertyChangedEventArgsEx args) throw new InvalidOperationException();
+                rawConfig["TwitchAuthConfig:" + args.PropertyName!] = args.Value?.ToString();
+            };
+        });
 
-            configurationBuilder.AddEnvironmentVariables();
-        }
-        private static void WithApplicationServices(HostBuilderContext context, IServiceCollection services)
-        {            
-            services.AddDbContext<ApplicationDbContext>(options =>
-            {
-                var dbPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ArcadePointsBot.db");
-                options.UseSqlite($"Data Source={dbPath}");
-            });
+        services.AddSingleton<IObserver<Exception>, GlobalRxExceptionHandler>();
+        services.AddSingleton<IAuthenticationService, TwitchAuthenticationService>();
+        services.AddScoped<TwitchPointRewardService>();
 
-            services.AddOptions<TwitchAuthConfig>().BindConfiguration("TwitchAuthConfig");
+        services.AddScoped(typeof(IEntityRepository<,>), typeof(DataEntityRepository<,>));
+        services.AddScoped<IRewardRepository, RewardRepository>();
 
-            services.Configure<TwitchAuthConfig>(options =>
-            {
-                var rawConfig = context.Configuration;
-                options.PropertyChanged += (o, e) =>
-                {
-                    if (e is not PropertyChangedEventArgsEx args) throw new InvalidOperationException();
-                    rawConfig["TwitchAuthConfig:" + args.PropertyName!] = args.Value?.ToString();
-                };
-            });
+        services.AddSingleton<TwitchWorker>();
 
-            services.AddSingleton<IObserver<Exception>, GlobalRxExceptionHandler>();
-            services.AddSingleton<IAuthenticationService, TwitchAuthenticationService>();
-            services.AddScoped<TwitchPointRewardService>();
-
-            services.AddScoped(typeof(IEntityRepository<,>), typeof(DataEntityRepository<,>));
-            services.AddScoped<IRewardRepository, RewardRepository>();
-
-            services.AddSingleton<TwitchWorker>();
-
-            services.AddTransient<ViewLocator>();
-            services.AddTransient<MainWindowViewModel>();
-            services.AddTransient<CreateRewardWindowViewModel>();
-        }
+        services.AddTransient<ViewLocator>();
+        services.AddTransient<MainWindowViewModel>();
+        services.AddTransient<CreateRewardWindowViewModel>();
+    }
 }

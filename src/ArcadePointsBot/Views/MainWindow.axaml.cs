@@ -5,6 +5,9 @@ using Avalonia.Threading;
 using ArcadePointsBot.Models;
 using ArcadePointsBot.ViewModels;
 using ReactiveUI;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using System.Globalization;
 
 namespace ArcadePointsBot.Views
 {
@@ -13,6 +16,7 @@ namespace ArcadePointsBot.Views
         public MainWindow()
         {
             InitializeComponent();
+
             this.WhenActivated(disposables =>
             {
 

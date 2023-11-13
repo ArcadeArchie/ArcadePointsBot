@@ -15,7 +15,6 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
-
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App"></FrameworkReference>
     <PackageReference Include="Avalonia" Version="11.0.5" />
@@ -47,6 +46,20 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Update="Resources\L10n.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>L10n.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Resources\L10n.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>L10n.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
 
   <ItemGroup>
     <None Update="appsettings.Development.json">

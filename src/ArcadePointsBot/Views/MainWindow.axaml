@@ -5,6 +5,7 @@
         xmlns:mm="using:ArcadePointsBot.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:assets="clr-namespace:ArcadePointsBot.Resources"
         xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
         xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
         xmlns:system="using:System"
@@ -19,21 +20,21 @@
     <DataGrid Grid.RowSpan="3" Margin="5" CornerRadius="5" Name="RewardGrid" ItemsSource="{Binding Rewards}"
               AutoGenerateColumns="False" IsReadOnly="True">
       <DataGrid.Columns>
-        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="Name"
+        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="{x:Static assets:L10n.Create_Title}"
                             Width="200" Binding="{Binding Title}"/>
-        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="Category"
+        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="{x:Static assets:L10n.Create_Category}"
                             Width="*" Binding="{Binding Category}"/>
-        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="Cost"
+        <DataGridTextColumn x:DataType="mm:TwitchReward" Header="{x:Static assets:L10n.Create_Cost}"
                             Width="100" Binding="{Binding Cost}"/>
         <DataGridTemplateColumn Width="*">
           <DataTemplate x:DataType="mm:TwitchReward">
             <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" HorizontalAlignment="Right">
-              <CheckBox IsChecked="{Binding IsEnabled}" Margin="5,0" Click="OnEnabledChanged">Enabled</CheckBox>
+              <CheckBox IsChecked="{Binding IsEnabled}" Margin="5,0" Click="OnEnabledChanged" Content="{x:Static assets:L10n.Main_CB_Enabled}"/>
               <StackPanel Orientation="Horizontal" Margin="5">
-                <Button Content="Edit" Margin="0" CornerRadius="10,0,0,10" BorderThickness="0"
+                <Button Content="{x:Static assets:L10n.Main_EditBtn}" Margin="0" CornerRadius="10,0,0,10" BorderThickness="0"
                         Command="{ReflectionBinding Path=DataContext.EditRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                         CommandParameter="{Binding }"/>
-                <Button Content="Delete" Margin="0" CornerRadius="0,10,10,0" BorderThickness="0"
+                <Button Content="{x:Static assets:L10n.Main_DeleteBtn}" Margin="0" CornerRadius="0,10,10,0" BorderThickness="0"
                         Command="{ReflectionBinding Path=DataContext.DeleteRewardCommand, RelativeSource={RelativeSource AncestorType=Window}}"
                         CommandParameter="{Binding }" />
               </StackPanel>
@@ -58,7 +59,7 @@
       </Border>
     </StackPanel>
     <Button Grid.Row="4" HorizontalAlignment="Right" Margin="0,0,5,0"
-      Content="Create Reward" Command="{Binding CreateRewardCommand}"/>
+      Content="{x:Static assets:L10n.Create_CreateBtn}" Command="{Binding CreateRewardCommand}"/>
   </Grid>
 
   <i:Interaction.Behaviors>
