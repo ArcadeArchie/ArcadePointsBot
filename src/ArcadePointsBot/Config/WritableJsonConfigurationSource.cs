@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Config
+namespace ArcadePointsBot.Config
 {
     internal class WritableJsonConfigurationSource : JsonConfigurationSource
     {

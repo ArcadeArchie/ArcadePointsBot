@@ -1,12 +1,12 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using AvaloniaApplication1.ViewModels;
+using ArcadePointsBot.ViewModels;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace AvaloniaApplication1
+namespace ArcadePointsBot
 {
     public static class ViewLocatorHelpers
     {

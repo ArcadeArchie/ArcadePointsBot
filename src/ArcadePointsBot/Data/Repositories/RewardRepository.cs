@@ -1,10 +1,10 @@
-﻿using AvaloniaApplication1.Data.Abstractions.Repositories;
-using AvaloniaApplication1.Data.Contexts;
-using AvaloniaApplication1.Models;
+﻿using ArcadePointsBot.Data.Abstractions.Repositories;
+using ArcadePointsBot.Data.Contexts;
+using ArcadePointsBot.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Data.Repositories
+namespace ArcadePointsBot.Data.Repositories
 {
     internal class RewardRepository : DataEntityRepository<TwitchReward, string>, IRewardRepository
     {

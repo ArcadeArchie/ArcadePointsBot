@@ -7,7 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 
-namespace AvaloniaApplication1.Auth;
+namespace ArcadePointsBot.Auth;
 public class TwitchAuthConfig : INotifyPropertyChanged
 {
     private DateTimeOffset? accessTokenExpiration;

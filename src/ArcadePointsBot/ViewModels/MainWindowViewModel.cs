@@ -1,10 +1,10 @@
 ﻿using Avalonia.Collections;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
-using AvaloniaApplication1.Auth;
-using AvaloniaApplication1.Models;
-using AvaloniaApplication1.Services;
-using AvaloniaApplication1.Views;
+using ArcadePointsBot.Auth;
+using ArcadePointsBot.Models;
+using ArcadePointsBot.Services;
+using ArcadePointsBot.Views;
 using DynamicData;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,7 +19,7 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.ViewModels
+namespace ArcadePointsBot.ViewModels
 {
     public partial class MainWindowViewModel : ViewModelBase
     {

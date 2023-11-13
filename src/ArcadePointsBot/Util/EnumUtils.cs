@@ -6,7 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Util;
+namespace ArcadePointsBot.Util;
 
 public static class EnumUtils
 {

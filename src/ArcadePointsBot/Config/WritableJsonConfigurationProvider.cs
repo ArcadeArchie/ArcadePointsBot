@@ -1,4 +1,4 @@
-﻿using AvaloniaApplication1.Auth;
+﻿using ArcadePointsBot.Auth;
 using Microsoft.Extensions.Configuration.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Config
+namespace ArcadePointsBot.Config
 {
     internal class WritableJsonConfigurationProvider : JsonConfigurationProvider
     {

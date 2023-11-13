@@ -1,9 +1,9 @@
-﻿using AvaloniaApplication1.Data.Abstractions;
+﻿using ArcadePointsBot.Data.Abstractions;
 using System.Collections.Generic;
 using System.ComponentModel;
 using TwitchLib.Api.Helix.Models.ChannelPoints;
 
-namespace AvaloniaApplication1.Models
+namespace ArcadePointsBot.Models
 {
     public class TwitchReward : IEntity<string>, INotifyPropertyChanged
     {

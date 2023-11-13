@@ -5,7 +5,7 @@ using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Auth
+namespace ArcadePointsBot.Auth
 {
     internal class TwitchAuthenticationService : IAuthenticationService
     {

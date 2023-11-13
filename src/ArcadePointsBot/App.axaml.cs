@@ -1,34 +1,28 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
-using Avalonia.Styling;
-using Avalonia.Themes.Fluent;
-using AvaloniaApplication1.Auth;
-using AvaloniaApplication1.Config;
-using AvaloniaApplication1.Data.Abstractions.Repositories;
-using AvaloniaApplication1.Data.Contexts;
-using AvaloniaApplication1.Data.Repositories;
-using AvaloniaApplication1.Services;
-using AvaloniaApplication1.Util;
-using AvaloniaApplication1.ViewModels;
-using AvaloniaApplication1.Views;
+using ArcadePointsBot.Auth;
+using ArcadePointsBot.Config;
+using ArcadePointsBot.Data.Abstractions.Repositories;
+using ArcadePointsBot.Data.Contexts;
+using ArcadePointsBot.Data.Repositories;
+using ArcadePointsBot.Services;
+using ArcadePointsBot.ViewModels;
+using ArcadePointsBot.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using ReactiveUI;
 using Serilog;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 
-namespace AvaloniaApplication1;
+namespace ArcadePointsBot;
 public partial class App : Application
 {
     public IHost? GlobalHost { get; private set; }

@@ -1,12 +1,12 @@
 ﻿using ReactiveUI;
-using AvaloniaApplication1.Models;
-using AvaloniaApplication1.Util;
+using ArcadePointsBot.Models;
+using ArcadePointsBot.Util;
 using System.Collections;
 using Avalonia.Input;
 using ReactiveUI.Fody.Helpers;
 using System;
 
-namespace AvaloniaApplication1.ViewModels
+namespace ArcadePointsBot.ViewModels
 {
     public class RewardActionViewModel : ReactiveObject
     {

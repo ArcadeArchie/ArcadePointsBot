@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Data.Abstractions;
+namespace ArcadePointsBot.Data.Abstractions;
 
 public interface IEntity<TId>
 {

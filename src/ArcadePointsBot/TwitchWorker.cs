@@ -1,10 +1,10 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
-using AvaloniaApplication1.Auth;
-using AvaloniaApplication1.Data.Abstractions.Repositories;
-using AvaloniaApplication1.Interop.Windows;
-using AvaloniaApplication1.Models;
-using AvaloniaApplication1.Views;
+using ArcadePointsBot.Auth;
+using ArcadePointsBot.Data.Abstractions.Repositories;
+using ArcadePointsBot.Interop.Windows;
+using ArcadePointsBot.Models;
+using ArcadePointsBot.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,7 +25,7 @@ using TwitchLib.PubSub;
 using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
 
-namespace AvaloniaApplication1;
+namespace ArcadePointsBot;
 
 public class TwitchWorker : BackgroundService, INotifyPropertyChanged
 {

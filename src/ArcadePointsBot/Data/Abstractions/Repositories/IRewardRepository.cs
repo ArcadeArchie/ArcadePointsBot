@@ -1,6 +1,6 @@
-﻿using AvaloniaApplication1.Models;
+﻿using ArcadePointsBot.Models;
 
-namespace AvaloniaApplication1.Data.Abstractions.Repositories
+namespace ArcadePointsBot.Data.Abstractions.Repositories
 {
     public interface IRewardRepository : IEntityRepository<TwitchReward, string>
     {

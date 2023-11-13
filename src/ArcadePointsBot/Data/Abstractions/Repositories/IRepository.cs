@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Data.Abstractions.Repositories;
+namespace ArcadePointsBot.Data.Abstractions.Repositories;
 
 public interface IEntityRepository<T, TId> : IReadRepository<T>, IWriteRepository<T, TId> where T : IEntity<TId>
 {

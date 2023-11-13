@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace AvaloniaApplication1.Data.Migrations
+namespace ArcadePointsBot.Data.Migrations
 {
     /// <inheritdoc />
     public partial class AddEnabledCol : Migration

@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.IO;
 
-namespace AvaloniaApplication1;
+namespace ArcadePointsBot;
 public class SystemBrowser : IBrowser
 {
     public int Port { get; }

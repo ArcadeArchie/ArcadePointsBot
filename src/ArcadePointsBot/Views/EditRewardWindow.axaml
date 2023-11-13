@@ -1,14 +1,13 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="using:ArcadePointsBot"
-        xmlns:app="using:AvaloniaApplication1"
-        xmlns:vm="using:AvaloniaApplication1.ViewModels"
-        xmlns:cc="using:AvaloniaApplication1.Views"
-        xmlns:models="using:AvaloniaApplication1.Models"
+        xmlns:vm="using:ArcadePointsBot.ViewModels"
+        xmlns:cc="using:ArcadePointsBot.Views"
+        xmlns:models="using:ArcadePointsBot.Models"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" MinWidth="800" MinHeight="450"
-        x:Class="AvaloniaApplication1.Views.EditRewardWindow"
+        x:Class="ArcadePointsBot.Views.EditRewardWindow"
         x:DataType="vm:EditRewardViewModel"
         Title="EditRewardWindow"
         Design.DataContext="{x:Static local:DesignData.EditRewardViewModel}">
@@ -35,7 +34,7 @@
     </DockPanel>
     <ListBox Grid.Row="1" ItemsSource="{Binding Errors}" Margin="5" CornerRadius="5" IsVisible="{Binding HasError}">
           <ListBox.ItemTemplate>
-            <DataTemplate x:DataType="app:Error">
+            <DataTemplate x:DataType="local:Error">
               <TextBlock Text="{Binding Message}"/>
             </DataTemplate>
           </ListBox.ItemTemplate>

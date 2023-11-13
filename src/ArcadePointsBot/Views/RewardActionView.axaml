@@ -4,10 +4,10 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             xmlns:models="using:AvaloniaApplication1.Models"
-             xmlns:vm="using:AvaloniaApplication1.ViewModels"
+             xmlns:models="using:ArcadePointsBot.Models"
+             xmlns:vm="using:ArcadePointsBot.ViewModels"
              mc:Ignorable="d" d:DesignWidth="820" MinHeight="50" MinWidth="400"
-             x:Class="AvaloniaApplication1.Views.RewardActionView"
+             x:Class="ArcadePointsBot.Views.RewardActionView"
              x:DataType="vm:RewardActionViewModel">
   
   <Border BorderBrush="White" BorderThickness="1" CornerRadius="5">

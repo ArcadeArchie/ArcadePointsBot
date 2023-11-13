@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AvaloniaApplication1.Data.Abstractions
+namespace ArcadePointsBot.Data.Abstractions
 {
     public interface IUnitOfWork
     {
