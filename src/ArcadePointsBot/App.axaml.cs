@@ -63,6 +63,7 @@ public partial class App : Application
 
         var lang = GlobalHost.Services.GetRequiredService<IConfiguration>().GetValue<string>("lang");
         ArcadePointsBot.Resources.L10n.Culture = new System.Globalization.CultureInfo(lang ?? "en-US");
+        ArcadePointsBot.Resources.Enums.Culture = new System.Globalization.CultureInfo(lang ?? "en-US");
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
