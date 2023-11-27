@@ -47,6 +47,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Resources\Enums.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Enums.resx</DependentUpon>
+    </Compile>
     <Compile Update="Resources\L10n.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -55,6 +60,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Resources\Enums.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Enums.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Resources\L10n.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>L10n.Designer.cs</LastGenOutput>
