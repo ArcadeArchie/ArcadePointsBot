@@ -19,8 +19,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ISSUE_TEMPLATE", "ISSUE_TEM
 		.github\ISSUE_TEMPLATE\config.yml = .github\ISSUE_TEMPLATE\config.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ArcadePointsBot.DNS", "src\ArcadePointsBot.DNS\ArcadePointsBot.DNS.csproj", "{2FF7C517-D479-466A-BF50-C27D8B562399}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,10 +29,6 @@ Global
 		{BB6C1FEA-EA74-47AD-AC7A-B619C243DE3C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB6C1FEA-EA74-47AD-AC7A-B619C243DE3C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB6C1FEA-EA74-47AD-AC7A-B619C243DE3C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2FF7C517-D479-466A-BF50-C27D8B562399}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2FF7C517-D479-466A-BF50-C27D8B562399}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2FF7C517-D479-466A-BF50-C27D8B562399}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2FF7C517-D479-466A-BF50-C27D8B562399}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
