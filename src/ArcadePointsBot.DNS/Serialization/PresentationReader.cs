@@ -1,11 +1,9 @@
 ﻿using System;
-using System.Buffers.Text;
-using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ArcadePointsBot.DNS.Serialization;
 
@@ -14,11 +12,11 @@ namespace ArcadePointsBot.DNS.Serialization;
 /// </summary>
 public class PresentationReader
 {
-    static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    static readonly DateTime UnixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    System.IO.TextReader text;
+    readonly TextReader text;
     TimeSpan? defaultTTL = null;
-    DomainName defaultDomainName = null;
+    DomainName? defaultDomainName = null;
     int parenLevel = 0;
     int previousChar = '\n';  // Assume a newline
     bool eolSeen = false;
@@ -105,8 +103,8 @@ public class PresentationReader
     DomainName MakeAbsoluteDomainName(string name)
     {
         // If an absolute name.
-        if (name.EndsWith("."))
-            return new DomainName(name.Substring(0, name.Length - 1));
+        if (name.EndsWith('.'))
+            return new DomainName(name[..^1]);
 
         // Then its a relative name.
         return DomainName.Join(new DomainName(name), Origin);
@@ -175,7 +173,7 @@ public class PresentationReader
     /// <returns>
     ///   An <see cref="IPAddress"/>.
     /// </returns>
-    public IPAddress ReadIPAddress(int length = 4)
+    public IPAddress ReadIPAddress(/*int length = 4*/)
     {
         return IPAddress.Parse(ReadToken());
     }
@@ -192,7 +190,7 @@ public class PresentationReader
         var token = ReadToken();
         if (token.StartsWith("TYPE"))
         {
-            return (DnsType)ushort.Parse(token.Substring(4), CultureInfo.InvariantCulture);
+            return (DnsType)ushort.Parse(token.AsSpan(4), CultureInfo.InvariantCulture);
         }
         return (DnsType)Enum.Parse(typeof(DnsType), token);
     }
@@ -239,7 +237,7 @@ public class PresentationReader
             throw new FormatException($"Expected RDATA leadin '\\#', not '{leadin}'.");
         var length = ReadUInt32();
         if (length == 0)
-            return new byte[0];
+            return [];
 
         // Get the hex string.
         var sb = new StringBuilder();
@@ -286,9 +284,9 @@ public class PresentationReader
     ///   the <see cref="ResourceRecord.DefaultTTL"/>.
     ///   </para>
     /// </remarks>
-    public ResourceRecord ReadResourceRecord()
+    public ResourceRecord? ReadResourceRecord()
     {
-        DomainName domainName = defaultDomainName;
+        DomainName? domainName = defaultDomainName;
         DnsClass klass = DnsClass.IN;
         TimeSpan? ttl = defaultTTL;
         DnsType? type = null;
@@ -325,7 +323,7 @@ public class PresentationReader
             }
 
             // Is TTL?
-            if (token.All(c => Char.IsDigit(c)))
+            if (token.All(char.IsDigit))
             {
                 ttl = TimeSpan.FromSeconds(uint.Parse(token));
                 continue;
@@ -334,10 +332,10 @@ public class PresentationReader
             // Is TYPE?
             if (token.StartsWith("TYPE"))
             {
-                type = (DnsType)ushort.Parse(token.Substring(4), CultureInfo.InvariantCulture);
+                type = (DnsType)ushort.Parse(token.AsSpan(4), CultureInfo.InvariantCulture);
                 continue;
             }
-            if (token.ToLowerInvariant() != "any" && Enum.TryParse<DnsType>(token, out DnsType t))
+            if (!token.Equals("any", StringComparison.InvariantCultureIgnoreCase) && Enum.TryParse(token, out DnsType t))
             {
                 type = t;
                 continue;
@@ -346,10 +344,10 @@ public class PresentationReader
             // Is CLASS?
             if (token.StartsWith("CLASS"))
             {
-                klass = (DnsClass)ushort.Parse(token.Substring(5), CultureInfo.InvariantCulture);
+                klass = (DnsClass)ushort.Parse(token.AsSpan(5), CultureInfo.InvariantCulture);
                 continue;
             }
-            if (Enum.TryParse<DnsClass>(token, out DnsClass k))
+            if (Enum.TryParse(token, out DnsClass k))
             {
                 klass = k;
                 continue;
@@ -358,7 +356,7 @@ public class PresentationReader
             throw new InvalidDataException($"Unknown token '{token}', expected a Class, Type or TTL.");
         }
 
-        if (domainName == null)
+        if (domainName is null)
         {
             throw new InvalidDataException("Missing resource record name.");
         }

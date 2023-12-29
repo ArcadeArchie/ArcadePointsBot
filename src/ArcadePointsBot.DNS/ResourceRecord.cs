@@ -1,4 +1,7 @@
 ﻿using ArcadePointsBot.DNS.Serialization;
+using System;
+using System.IO;
+using System.Linq;
 
 namespace ArcadePointsBot.DNS;
 
@@ -36,7 +39,7 @@ public class ResourceRecord : DnsObject, IPresentationSerialiser
     ///   An owner name, i.e., the name of the node to which this
     ///   resource record pertains.
     /// </summary>
-    public DomainName Name { get; set; }
+    public DomainName Name { get; set; } = null!;
 
     /// <summary>
     ///   The canonical form of the owner name.
@@ -113,7 +116,7 @@ public class ResourceRecord : DnsObject, IPresentationSerialiser
         using (var ms = new MemoryStream())
         {
             var writer = new WireWriter(ms);
-            this.WriteData(writer);
+            WriteData(writer);
             return (int)ms.Length;
         }
     }
@@ -132,7 +135,7 @@ public class ResourceRecord : DnsObject, IPresentationSerialiser
         using (var ms = new MemoryStream())
         {
             var writer = new WireWriter(ms);
-            this.WriteData(writer);
+            WriteData(writer);
             return ms.ToArray();
         }
     }
@@ -223,16 +226,16 @@ public class ResourceRecord : DnsObject, IPresentationSerialiser
     ///   are equal. Note that the <see cref="TTL"/> field is explicitly 
     ///   excluded from the comparison.
     /// </remarks>
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         var that = obj as ResourceRecord;
-        if (that == null) return false;
+        if (that is null) return false;
 
-        if (this.Name != that.Name) return false;
-        if (this.Class != that.Class) return false;
-        if (this.Type != that.Type) return false;
+        if (Name != that.Name) return false;
+        if (Class != that.Class) return false;
+        if (Type != that.Type) return false;
 
-        return this.GetData().SequenceEqual(that.GetData());
+        return GetData().SequenceEqual(that.GetData());
     }
 
     /// <summary>
@@ -356,13 +359,13 @@ public class ResourceRecord : DnsObject, IPresentationSerialiser
     /// <param name="text">
     ///   The presentation format.
     /// </param>
-    public ResourceRecord Read(string text)
+    public ResourceRecord? Read(string text)
     {
         return Read(new PresentationReader(new StringReader(text)));
     }
 
     /// <inheritdoc />
-    public ResourceRecord Read(PresentationReader reader)
+    public ResourceRecord? Read(PresentationReader reader)
     {
         return reader.ReadResourceRecord();
     }
@@ -377,8 +380,5 @@ public class ResourceRecord : DnsObject, IPresentationSerialiser
     /// <remarks>
     ///   Derived classes must implement this method.
     /// </remarks>
-    public virtual void ReadData(PresentationReader reader)
-    {
-    }
-
+    public virtual void ReadData(PresentationReader reader) { }
 }

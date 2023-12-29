@@ -6,30 +6,30 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace ArcadePointsBot.DNS.Records;
-
 /// <summary>
-///   The canonical name for an alias.
+///   Alias for a name and all its subnames.
 /// </summary>
 /// <remarks>
-///  CNAME RRs cause no additional section processing, but name servers may
-///  choose to restart the query at the canonical name in certain cases. See
-///  the description of name server logic in [RFC - 1034] for details.
+///  Alias for a name and all its subnames, unlike <see cref="CNAMERecord"/>, which is an 
+///  alias for only the exact name. Like a CNAME record, the DNS lookup will continue by 
+///  retrying the lookup with the new name.
 /// </remarks>
-public class CNAMERecord : ResourceRecord
+public class DNAMERecord : ResourceRecord
 {
+    /// <summary>
+    ///   Creates a new instance of the <see cref="DNAMERecord"/> class.
+    /// </summary>
+    public DNAMERecord() : base()
+    {
+        Type = DnsType.DNAME;
+    }
+
     /// <summary>
     ///  A domain-name which specifies the canonical or primary
     ///  name for the owner. The owner name is an alias.
     /// </summary>
     public DomainName? Target { get; set; }
-    
-    /// <summary>
-    ///   Creates a new instance of the <see cref="CNAMERecord"/> class.
-    /// </summary>
-    public CNAMERecord() : base()
-    {
-        Type = DnsType.CNAME;
-    }
+
 
     /// <inheritdoc />
     public override void ReadData(WireReader reader, int length)
@@ -46,12 +46,14 @@ public class CNAMERecord : ResourceRecord
     /// <inheritdoc />
     public override void WriteData(WireWriter writer)
     {
-        writer.WriteDomainName(Target);
+        if (Target is null) throw new InvalidOperationException("Target cannot be null");
+        writer.WriteDomainName(Target, uncompressed: true);
     }
 
     /// <inheritdoc />
     public override void WriteData(PresentationWriter writer)
     {
+        if (Target is null) throw new InvalidOperationException("Target cannot be null");
         writer.WriteDomainName(Target, appendSpace: false);
     }
 

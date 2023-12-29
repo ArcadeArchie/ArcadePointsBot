@@ -25,19 +25,19 @@ namespace ArcadePointsBot.DNS.Records;
 public class NSRecord : ResourceRecord
 {
     /// <summary>
+    ///   A domain-name which specifies a host which should be
+    ///   authoritative for the specified class and domain.
+    /// </summary>
+    public DomainName? Authority { get; set; }
+
+    
+    /// <summary>
     ///   Creates a new instance of the <see cref="NSRecord"/> class.
     /// </summary>
     public NSRecord() : base()
     {
         Type = DnsType.NS;
     }
-
-    /// <summary>
-    ///   A domain-name which specifies a host which should be
-    ///   authoritative for the specified class and domain.
-    /// </summary>
-    public DomainName Authority { get; set; }
-
 
     /// <inheritdoc />
     public override void ReadData(WireReader reader, int length)

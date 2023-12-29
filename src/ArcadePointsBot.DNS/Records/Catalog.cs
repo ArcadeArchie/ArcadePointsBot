@@ -3,10 +3,9 @@ using ArcadePointsBot.DNS.Serialization;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ArcadePointsBot.DNS.Records;
 
@@ -40,7 +39,7 @@ public class Catalog : ConcurrentDictionary<DomainName, Node>
         while (true)
         {
             var r = reader.ReadResourceRecord();
-            if (r == null)
+            if (r is null)
             {
                 break;
             }
@@ -86,7 +85,7 @@ public class Catalog : ConcurrentDictionary<DomainName, Node>
         var keys = Keys.Where(k => k.BelongsTo(name));
         foreach (var key in keys)
         {
-            TryRemove(key, out Node _);
+            TryRemove(key, out _);
         }
     }
 
@@ -141,15 +140,19 @@ public class Catalog : ConcurrentDictionary<DomainName, Node>
     public Node IncludeRootHints()
     {
         var assembly = typeof(Catalog).GetTypeInfo().Assembly;
-        using (var hints = assembly.GetManifestResourceStream("Makaretu.Dns.Resolving.RootHints"))
+        using var hints = assembly.GetManifestResourceStream("ArcadePointsBot.DNS.Resolving.RootHints");
+
+        if (hints is not null)
         {
             var reader = new PresentationReader(new StreamReader(hints));
-            ResourceRecord r;
-            while (null != (r = reader.ReadResourceRecord()))
+            ResourceRecord? r = reader.ReadResourceRecord();
+            while (r is not null)
             {
                 Add(r);
+                r = reader.ReadResourceRecord();
             }
         }
+
 
         var root = this[new DomainName("")];
         root.Authoritative = true;
@@ -171,7 +174,7 @@ public class Catalog : ConcurrentDictionary<DomainName, Node>
         while (true)
         {
             var r = reader.ReadResourceRecord();
-            if (r == null)
+            if (r is null)
             {
                 break;
             }

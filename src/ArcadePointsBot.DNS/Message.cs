@@ -1,5 +1,9 @@
 ﻿using ArcadePointsBot.DNS.Records;
 using ArcadePointsBot.DNS.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 
 namespace ArcadePointsBot.DNS;
 
@@ -98,9 +102,9 @@ public class Message : DnsObject
         get
         {
             var opt = AdditionalRecords.OfType<OPTRecord>().FirstOrDefault();
-            if (opt == null)
+            if (opt is null)
                 return (MessageOperation)opcode4;
-            return (MessageOperation)(((ushort)opt.Opcode8 << 4) | opcode4);
+            return (MessageOperation)((opt.Opcode8 << 4) | opcode4);
         }
         set
         {
@@ -111,13 +115,13 @@ public class Message : DnsObject
             if ((extendedOpcode & 0xff0) == 0)
             {
                 opcode4 = (byte)extendedOpcode;
-                if (opt != null)
+                if (opt is not null)
                     opt.Opcode8 = 0;
                 return;
             }
 
             // Extended opcode, needs an OPT resource record.
-            if (opt == null)
+            if (opt is null)
             {
                 opt = new OPTRecord();
                 AdditionalRecords.Add(opt);
@@ -232,7 +236,7 @@ public class Message : DnsObject
         set
         {
             var opt = AdditionalRecords.OfType<OPTRecord>().FirstOrDefault();
-            if (opt == null)
+            if (opt is null)
             {
                 opt = new OPTRecord();
                 AdditionalRecords.Add(opt);
@@ -255,7 +259,7 @@ public class Message : DnsObject
     /// <value>
     ///   A list of questions.
     /// </value>
-    public List<Question> Questions { get; } = new List<Question>();
+    public List<Question> Questions { get; } = [];
 
     /// <summary>
     ///   The list of answers.
@@ -263,7 +267,7 @@ public class Message : DnsObject
     /// <value>
     ///   A list of answers.
     /// </value>
-    public List<ResourceRecord> Answers { get; set; } = new List<ResourceRecord>();
+    public List<ResourceRecord> Answers { get; set; } = [];
 
     /// <summary>
     ///   The list of authority records.
@@ -271,7 +275,7 @@ public class Message : DnsObject
     /// <value>
     ///   A list of authority resource records.
     /// </value>
-    public List<ResourceRecord> AuthorityRecords { get; set; } = new List<ResourceRecord>();
+    public List<ResourceRecord> AuthorityRecords { get; set; } = [];
 
     /// <summary>
     ///   The list of additional records.
@@ -279,7 +283,7 @@ public class Message : DnsObject
     /// <value>
     ///   A list of additional resource records.
     /// </value>
-    public List<ResourceRecord> AdditionalRecords { get; set; } = new List<ResourceRecord>();
+    public List<ResourceRecord> AdditionalRecords { get; set; } = [];
 
     /// <summary>
     ///   Create a response for the query message.
@@ -423,42 +427,40 @@ public class Message : DnsObject
     /// <inheritdoc />
     public override string ToString()
     {
-        using (var s = new StringWriter())
+        using var s = new StringWriter();
+        s.Write(";; Header:");
+        if (QR) s.Write(" QR");
+        if (AA) s.Write(" AA");
+        if (TC) s.Write(" TC");
+        if (RD) s.Write(" RD");
+        if (AD) s.Write(" AD");
+        if (CD) s.Write(" CD");
+        s.Write(" RCODE=");
+        s.Write(Status);
+        s.WriteLine();
+
+        s.WriteLine();
+        s.WriteLine(";; Question");
+        if (Questions.Count == 0)
         {
-            s.Write(";; Header:");
-            if (QR) s.Write(" QR");
-            if (AA) s.Write(" AA");
-            if (TC) s.Write(" TC");
-            if (RD) s.Write(" RD");
-            if (AD) s.Write(" AD");
-            if (CD) s.Write(" CD");
-            s.Write(" RCODE=");
-            s.Write(Status);
-            s.WriteLine();
-
-            s.WriteLine();
-            s.WriteLine(";; Question");
-            if (Questions.Count == 0)
-            {
-                s.WriteLine(";;  (empty)");
-            }
-            else
-            {
-                foreach (var q in Questions)
-                {
-                    s.WriteLine(q.ToString());
-                }
-            }
-
-            Stringify(s, "Answer", Answers);
-            Stringify(s, "Authority", AuthorityRecords);
-            Stringify(s, "Additional", AdditionalRecords);
-
-            return s.ToString();
+            s.WriteLine(";;  (empty)");
         }
+        else
+        {
+            foreach (var q in Questions)
+            {
+                s.WriteLine(q.ToString());
+            }
+        }
+
+        Stringify(s, "Answer", Answers);
+        Stringify(s, "Authority", AuthorityRecords);
+        Stringify(s, "Additional", AdditionalRecords);
+
+        return s.ToString();
     }
 
-    void Stringify(StringWriter s, string title, List<ResourceRecord> records)
+    static void Stringify(StringWriter s, string title, List<ResourceRecord> records)
     {
         s.WriteLine();
         s.Write(";; ");
@@ -579,16 +581,26 @@ public enum MessageStatus : byte
     ///   zone denoted by the Zone Section.
     /// </summary>
     NotZone = 10,
-
+    
+#pragma warning disable CA1069 // Enums values should not be duplicated
     /// <summary>
     ///   Invalid version.
     /// </summary>
+    /// <remarks>
+    ///    Has the same byte value as <see cref="BadSignature"/> see 
+    ///    <see href="https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6">IANA DNS params section 6</see>
+    /// </remarks>
     BadVersion = 16,
 
     /// <summary>
-    ///   Invalid signature (TSIG).
+    ///   Invalid signature (TSIG). 
     /// </summary>
+    /// <remarks>
+    ///    Has the same byte value as <see cref="BadVersion"/> see 
+    ///    <see href="https://www.iana.org/assignments/dns-parameters/dns-parameters.xhtml#dns-parameters-6">IANA DNS params section 6</see>
+    /// </remarks>
     BadSignature = 16,
+#pragma warning restore CA1069 // Enums values should not be duplicated
 
     /// <summary>
     ///   Invalid key (TSIG).

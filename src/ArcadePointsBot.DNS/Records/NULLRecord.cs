@@ -1,17 +1,24 @@
 ﻿using ArcadePointsBot.DNS.Serialization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ArcadePointsBot.DNS.Records;
-
 /// <summary>
-///   An unknown resource record.
+///   A null RR (EXPERIMENTAL).
 /// </summary>
-public class UnknownRecord : ResourceRecord
+/// <remarks>
+///  NULL records cause no additional section processing.  NULL RRs are not
+///  allowed in master files. NULLs are used as placeholders in some
+///  experimental extensions of the DNS.
+/// </remarks>
+public class NULLRecord : ResourceRecord
 {
+    /// <summary>
+    ///   Creates a new instance of the <see cref="NULLRecord"/> class.
+    /// </summary>
+    public NULLRecord() : base()
+    {
+        Type = DnsType.NULL;
+    }
+
     /// <summary>
     ///    Specfic data for the resource.
     /// </summary>
@@ -35,5 +42,4 @@ public class UnknownRecord : ResourceRecord
     {
         writer.WriteBytes(Data);
     }
-
 }

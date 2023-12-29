@@ -17,7 +17,7 @@ namespace ArcadePointsBot.DNS.Resolving;
 ///   taken on 18 July 2018.
 /// </remarks>
 [DebuggerDisplay("Count = {Count}")]
-public sealed class ConcurrentSet<T> : ICollection<T>
+public sealed class ConcurrentSet<T> : ICollection<T> where T : notnull
 {
     /// <summary>
     /// The default concurrency level is 2. That means the collection can cope with up to two
@@ -118,7 +118,7 @@ public sealed class ConcurrentSet<T> : ICollection<T>
     /// <returns>true if the value was removed successfully; otherwise false.</returns>
     public bool Remove(T value)
     {
-        return _dictionary.TryRemove(value, out var b);
+        return _dictionary.TryRemove(value, out _);
     }
 
     /// <summary>
@@ -132,7 +132,7 @@ public sealed class ConcurrentSet<T> : ICollection<T>
     /// <summary>
     ///   enumerator for the keys.
     /// </summary>
-    public struct KeyEnumerator
+    public readonly struct KeyEnumerator
     {
         private readonly IEnumerator<KeyValuePair<T, byte>> _kvpEnumerator;
 

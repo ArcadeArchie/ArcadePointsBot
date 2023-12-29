@@ -25,7 +25,7 @@ public static class ResourceRegistry
 
     static ResourceRegistry()
     {
-        Records = new Dictionary<DnsType, Func<ResourceRecord>>();
+        Records = [];
         Register<ARecord>();
         Register<AAAARecord>();
         Register<AFSDBRecord>();
@@ -85,7 +85,7 @@ public static class ResourceRegistry
     /// </remarks>
     public static ResourceRecord Create(DnsType type)
     {
-        if (Records.TryGetValue(type, out Func<ResourceRecord> maker))
+        if (Records.TryGetValue(type, out Func<ResourceRecord>? maker))
         {
             return maker();
         }

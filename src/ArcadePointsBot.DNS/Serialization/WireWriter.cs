@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ArcadePointsBot.DNS.Serialization;
 
@@ -15,12 +15,12 @@ public class WireWriter
 {
     const int maxPointer = 0x3FFF;
     const ulong uint48MaxValue = 0XFFFFFFFFFFFFul;
-    static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    static readonly DateTime UnixEpoch = new(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
 
     Stream stream;
-    Dictionary<string, int> pointers = new Dictionary<string, int>();
-    Stack<Stream> scopes = new Stack<Stream>();
+    readonly Dictionary<string, int> pointers = [];
+    readonly Stack<Stream> scopes = new();
 
     /// <summary>
     ///   The writer relative position within the stream.
@@ -125,11 +125,11 @@ public class WireWriter
     /// <exception cref="ArgumentException">
     ///   When the length is greater than <see cref="byte.MaxValue"/>.
     /// </exception>
-    public void WriteByteLengthPrefixedBytes(byte[] bytes)
+    public void WriteByteLengthPrefixedBytes(byte[]? bytes)
     {
         var length = bytes?.Length ?? 0;
         if (length > byte.MaxValue)
-            throw new ArgumentException($"Length can not exceed {byte.MaxValue}.", "bytes");
+            throw new ArgumentException($"Length can not exceed {byte.MaxValue}.", nameof(bytes));
 
         WriteByte((byte)length);
         WriteBytes(bytes);
@@ -144,7 +144,7 @@ public class WireWriter
     /// <exception cref="ArgumentException">
     ///   When the length is greater than <see cref="ushort.MaxValue"/>.
     /// </exception>
-    public void WriteUint16LengthPrefixedBytes(byte[] bytes)
+    public void WriteUint16LengthPrefixedBytes(byte[]? bytes)
     {
         var length = bytes?.Length ?? 0;
         if (length > ushort.MaxValue)
@@ -250,9 +250,9 @@ public class WireWriter
     ///   that this field may be an odd number of octets; no
     ///   padding is used.
     /// </remarks>
-    public void WriteDomainName(DomainName name, bool uncompressed = false)
+    public void WriteDomainName(DomainName? name, bool uncompressed = false)
     {
-        if (name == null)
+        if (name is null)
         {
             stream.WriteByte(0); // terminating byte
             ++Position;
@@ -305,8 +305,9 @@ public class WireWriter
     ///   Strings are encoded with a length prefixed byte.  All strings must be
     ///   ASCII.
     /// </remarks>
-    public void WriteString(string value)
+    public void WriteString(string? value)
     {
+        ArgumentNullException.ThrowIfNull(value, nameof(value));
         if (value.Any(c => c > 0x7F))
         {
             throw new ArgumentException("Only ASCII characters are allowed.");
@@ -390,9 +391,9 @@ public class WireWriter
     ///   Write an IP address.
     /// </summary>
     /// <param name="value"></param>
-    public void WriteIPAddress(IPAddress value)
+    public void WriteIPAddress(IPAddress? value)
     {
-        WriteBytes(value.GetAddressBytes());
+        WriteBytes(value?.GetAddressBytes());
     }
 
     /// <summary>
@@ -435,11 +436,11 @@ public class WireWriter
             stream.WriteByte((byte)window.Window);
             stream.WriteByte((byte)mask.Count);
             Position += 2;
-            WriteBytes(mask.ToArray());
+            WriteBytes([.. mask]);
         }
     }
 
-    static IEnumerable<Byte> ToBytes(BitArray bits, bool MSB = false)
+    static IEnumerable<byte> ToBytes(BitArray bits, bool MSB = false)
     {
         int bitCount = 7;
         int outByte = 0;

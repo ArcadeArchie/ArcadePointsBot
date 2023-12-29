@@ -1,11 +1,8 @@
 ﻿using ArcadePointsBot.DNS.Records;
 using ArcadePointsBot.DNS.Serialization;
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace ArcadePointsBot.DNS.Resolving;
 
@@ -21,7 +18,7 @@ public partial class NameServer : IResolver
     ///   A subset of the DNS database. Typically (1) one or more zones or (2) a cache of received
     ///   responses.
     /// </value>
-    public Catalog Catalog { get; set; }
+    public Catalog Catalog { get; set; } = null!;
 
     /// <summary>
     ///   Determines how multiple questions are answered.
@@ -38,9 +35,9 @@ public partial class NameServer : IResolver
     public bool AnswerAllQuestions { get; set; }
 
     /// <inheritdoc />
-    public async Task<Message> ResolveAsync(
+    public async Task<Message?> ResolveAsync(
         Message request,
-        CancellationToken cancel = default(CancellationToken))
+        CancellationToken cancel = default)
     {
         var response = request.CreateResponse();
 
@@ -98,9 +95,9 @@ public partial class NameServer : IResolver
     ///   If the question's domain does not exist, then the closest authority
     ///   (<see cref="SOARecord"/>) is added to the <see cref="Message.AuthorityRecords"/>.
     /// </remarks>
-    public async Task<Message> ResolveAsync(Question question, Message response = null, CancellationToken cancel = default(CancellationToken))
+    public async Task<Message> ResolveAsync(Question question, Message? response = null, CancellationToken cancel = default)
     {
-        response = response ?? new Message { QR = true };
+        response ??= new Message { QR = true };
 
         // Get answer and details of the domain.
         bool found = await FindAnswerAsync(question, response, cancel);
@@ -112,7 +109,7 @@ public partial class NameServer : IResolver
 
         // Add the NS records for the answered domain into the
         // the authority section.
-        if (found && soa != null)
+        if (found && soa is not null)
         {
             var res = new Message();
             var q = new Question { Name = soa.Name, Class = soa.Class, Type = DnsType.NS };
@@ -123,7 +120,7 @@ public partial class NameServer : IResolver
         // If a name error, then add the domain authority.
         if (response.Status == MessageStatus.NameError)
         {
-            if (soa != null)
+            if (soa is not null)
             {
                 response.AuthorityRecords.Add(soa);
             }
@@ -157,7 +154,7 @@ public partial class NameServer : IResolver
     protected Task<bool> FindAnswerAsync(Question question, Message response, CancellationToken cancel)
     {
         // Find a node for the question name.
-        if (!Catalog.TryGetValue(question.Name, out Node node))
+        if (!Catalog!.TryGetValue(question.Name ?? "", out Node? node))
         {
             return Task.FromResult(false);
         }
@@ -180,7 +177,7 @@ public partial class NameServer : IResolver
         // If node is alias (CNAME), then find answers for the alias' target.
         // The CNAME is added to the answers.
         var cname = node.Resources.OfType<CNAMERecord>().FirstOrDefault();
-        if (cname != null)
+        if (cname is not null)
         {
             response.Answers.Add(cname);
             question = question.Clone<Question>();
@@ -192,15 +189,15 @@ public partial class NameServer : IResolver
         return Task.FromResult(false);
     }
 
-    SOARecord FindAuthority(DomainName domainName)
+    SOARecord? FindAuthority(DomainName? domainName)
     {
-        var name = domainName;
-        while (name != null)
+        DomainName? name = domainName;
+        while (name is not null)
         {
-            if (Catalog.TryGetValue(name, out Node node))
+            if (Catalog!.TryGetValue(name, out Node? node))
             {
                 var soa = node.Resources.OfType<SOARecord>().FirstOrDefault();
-                if (soa != null) return soa;
+                if (soa is not null) return soa;
             }
             name = name.Parent();
         }
@@ -224,14 +221,14 @@ public partial class NameServer : IResolver
                     question.Class = resource.Class;
                     question.Name = resource.Name;
                     question.Type = DnsType.AAAA;
-                    _ = FindAnswerAsync(question, extras, default(CancellationToken)).Result;
+                    _ = FindAnswerAsync(question, extras, default).Result;
                     break;
 
                 case DnsType.AAAA:
                     question.Class = resource.Class;
                     question.Name = resource.Name;
                     question.Type = DnsType.A;
-                    _ = FindAnswerAsync(question, extras, default(CancellationToken)).Result;
+                    _ = FindAnswerAsync(question, extras, default).Result;
                     break;
 
                 case DnsType.NS:
@@ -244,7 +241,7 @@ public partial class NameServer : IResolver
                     question.Class = resource.Class;
                     question.Name = ptr.DomainName;
                     question.Type = DnsType.ANY;
-                    _ = FindAnswerAsync(question, extras, default(CancellationToken)).Result;
+                    _ = FindAnswerAsync(question, extras, default).Result;
                     break;
 
                 case DnsType.SOA:
@@ -255,7 +252,7 @@ public partial class NameServer : IResolver
                     question.Class = resource.Class;
                     question.Name = resource.Name;
                     question.Type = DnsType.TXT;
-                    _ = FindAnswerAsync(question, extras, default(CancellationToken)).Result;
+                    _ = FindAnswerAsync(question, extras, default).Result;
 
                     FindAddresses(((SRVRecord)resource).Target, resource.Class, extras);
                     break;
@@ -280,7 +277,7 @@ public partial class NameServer : IResolver
         }
     }
 
-    void FindAddresses(DomainName name, DnsClass klass, Message response)
+    void FindAddresses(DomainName? name, DnsClass klass, Message response)
     {
         var question = new Question
         {
@@ -288,9 +285,9 @@ public partial class NameServer : IResolver
             Class = klass,
             Type = DnsType.A
         };
-        var _ = FindAnswerAsync(question, response, default(CancellationToken)).Result;
+        var _ = FindAnswerAsync(question, response, default).Result;
 
         question.Type = DnsType.AAAA;
-        _ = FindAnswerAsync(question, response, default(CancellationToken)).Result;
+        _ = FindAnswerAsync(question, response, default).Result;
     }
 }

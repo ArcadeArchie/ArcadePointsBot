@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ArcadePointsBot.DNS;
 
@@ -35,9 +34,9 @@ public class DomainName : IEquatable<DomainName>
     ///   the root domain. The root domain does not have a formal name and its
     ///   label in the DNS hierarchy is an empty string. 
     /// </remarks>
-    public static DomainName Root = new DomainName(String.Empty);
+    public static DomainName Root = new(string.Empty);
 
-    List<string> labels = new List<string>();
+    readonly List<string> labels = [];
 
     /// <summary>
     ///   A sequence of labels that make up the domain name.
@@ -94,12 +93,12 @@ public class DomainName : IEquatable<DomainName>
     /// <returns>
     ///   A new domain containing all the <paramref name="names"/>.
     /// </returns>
-    public static DomainName Join(params DomainName[] names)
+    public static DomainName Join(params DomainName?[] names)
     {
         var joinedName = new DomainName();
         foreach (var name in names)
         {
-            joinedName.labels.AddRange(name.Labels);
+            joinedName.labels.AddRange(name?.Labels ?? []);
         }
         return joinedName;
     }
@@ -189,9 +188,9 @@ public class DomainName : IEquatable<DomainName>
     /// <returns>
     ///   <b>true</b> if this domain name is a subdomain of <paramref name="domain"/>.
     /// </returns>
-    public bool IsSubdomainOf(DomainName domain)
+    public bool IsSubdomainOf(DomainName? domain)
     {
-        if (domain == null)
+        if (domain is null)
         {
             return false;
         }
@@ -218,7 +217,7 @@ public class DomainName : IEquatable<DomainName>
     ///   The domain name of the parent or <b>null</b> if
     ///   there is no parent; e.g. this is the root.
     /// </returns>
-    public DomainName Parent()
+    public DomainName? Parent()
     {
         if (labels.Count == 0)
         {
@@ -280,29 +279,27 @@ public class DomainName : IEquatable<DomainName>
     }
 
     /// <inheritdoc />
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
         var that = obj as DomainName;
-        return (that == null)
-           ? false
-           : this.Equals(that);
+        return that is not null && Equals(that);
     }
 
     /// <inheritdoc />
-    public bool Equals(DomainName that)
+    public bool Equals(DomainName? that)
     {
         if (that is null)
         {
             return false;
         }
-        var n = this.labels.Count;
+        var n = labels.Count;
         if (n != that.labels.Count)
         {
             return false;
         }
         for (var i = 0; i < n; ++i)
         {
-            if (!LabelsEqual(this.labels[i], that.labels[i]))
+            if (!LabelsEqual(labels[i], that.labels[i]))
             {
                 return false;
             }
@@ -313,7 +310,7 @@ public class DomainName : IEquatable<DomainName>
     /// <summary>
     ///   Value equality.
     /// </summary>
-    public static bool operator ==(DomainName a, DomainName b)
+    public static bool operator ==(DomainName? a, DomainName? b)
     {
         if (object.ReferenceEquals(a, b)) return true;
         if (a is null) return false;
@@ -325,7 +322,7 @@ public class DomainName : IEquatable<DomainName>
     /// <summary>
     ///   Value inequality.
     /// </summary>
-    public static bool operator !=(DomainName a, DomainName b)
+    public static bool operator !=(DomainName? a, DomainName? b)
     {
         return !(a == b);
     }
@@ -347,6 +344,11 @@ public class DomainName : IEquatable<DomainName>
         return new DomainName(s);
     }
 
+    public static implicit operator string(DomainName? domain)
+    {
+        return domain?.ToString() ?? "";
+    }
+
     /// <summary>
     ///   Determines if the two domain name labels are equal.
     /// </summary>
@@ -361,11 +363,6 @@ public class DomainName : IEquatable<DomainName>
     /// </remarks>
     public static bool LabelsEqual(string a, string b)
     {
-#if NETSTANDARD14
-            return a?.ToLowerInvariant() == b?.ToLowerInvariant();
-#else
         return 0 == StringComparer.InvariantCultureIgnoreCase.Compare(a, b);
-#endif
     }
-
 }

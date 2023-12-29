@@ -16,14 +16,6 @@ namespace ArcadePointsBot.DNS.Records;
 public class RRSIGRecord : ResourceRecord
 {
     /// <summary>
-    ///   Creates a new instance of the <see cref="RRSIGRecord"/> class.
-    /// </summary>
-    public RRSIGRecord() : base()
-    {
-        Type = DnsType.RRSIG;
-    }
-
-    /// <summary>
     ///   The type of the RRset that is covered by this signature.
     /// </summary>
     /// <value>
@@ -87,7 +79,7 @@ public class RRSIGRecord : ResourceRecord
     ///   The owner name of the <see cref="DNSKEYRecord"/> that
     ///   validates the <see cref="Signature"/>.
     /// </summary>
-    public DomainName SignerName { get; set; }
+    public DomainName? SignerName { get; set; }
 
     /// <summary>
     ///   The cryptographic signature.
@@ -95,7 +87,15 @@ public class RRSIGRecord : ResourceRecord
     /// <value>
     ///   The format depends upon the <see cref="Algorithm"/>.
     /// </value>
-    public byte[] Signature { get; set; }
+    public byte[]? Signature { get; set; }
+
+    /// <summary>
+    ///   Creates a new instance of the <see cref="RRSIGRecord"/> class.
+    /// </summary>
+    public RRSIGRecord() : base()
+    {
+        Type = DnsType.RRSIG;
+    }
 
     /// <inheritdoc />
     public override void ReadData(WireReader reader, int length)

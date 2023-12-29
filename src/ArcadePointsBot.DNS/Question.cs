@@ -1,6 +1,7 @@
 ﻿using ArcadePointsBot.DNS.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,7 +16,7 @@ public class Question : DnsObject
     /// <summary>
     ///    A domain name to query.
     /// </summary>
-    public DomainName Name { get; set; }
+    public DomainName? Name { get; set; }
 
     /// <summary>
     ///    A two octet code which specifies the type of the query.
@@ -59,13 +60,11 @@ public class Question : DnsObject
     /// <inheritdoc />
     public override string ToString()
     {
-        using (var s = new StringWriter())
-        {
-            var writer = new PresentationWriter(s);
-            writer.WriteDomainName(Name);
-            writer.WriteDnsClass(Class);
-            writer.WriteDnsType(Type, appendSpace: false);
-            return s.ToString();
-        }
+        using var s = new StringWriter();
+        var writer = new PresentationWriter(s);
+        writer.WriteDomainName(Name);
+        writer.WriteDnsClass(Class);
+        writer.WriteDnsType(Type, appendSpace: false);
+        return s.ToString();
     }
 }

@@ -1,9 +1,6 @@
 ﻿using ArcadePointsBot.DNS.Serialization;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace ArcadePointsBot.DNS.Extended;
 
@@ -38,17 +35,12 @@ public class EdnsKeepaliveOption : EdnsOption
     /// <inheritdoc />
     public override void ReadData(WireReader reader, int length)
     {
-        switch (length)
+        Timeout = length switch
         {
-            case 0:
-                Timeout = null;
-                break;
-            case 2:
-                Timeout = TimeSpan.FromMilliseconds((int)reader.ReadUInt16() * 100);
-                break;
-            default:
-                throw new InvalidDataException($"Invalid EdnsKeepAlive length of '{length}'.");
-        }
+            0 => null,
+            2 => (TimeSpan?)TimeSpan.FromMilliseconds(reader.ReadUInt16() * 100),
+            _ => throw new InvalidDataException($"Invalid EdnsKeepAlive length of '{length}'."),
+        };
     }
 
     /// <inheritdoc />

@@ -1,4 +1,7 @@
-﻿namespace ArcadePointsBot.DNS.Extended.Crypto;
+﻿using System;
+using System.Collections.Generic;
+
+namespace ArcadePointsBot.DNS.Extended.Crypto;
 
 /// <summary>
 ///   Registry of implemented <see cref="SecurityAlgorithm"/>.
@@ -25,7 +28,7 @@ public static class SecurityAlgorithmRegistry
         /// <summary>
         ///   Other names associated with the algorithm.
         /// </summary>
-        public string[] OtherNames { get; set; } = new string[0];
+        public string[] OtherNames { get; set; } = [];
     }
 
     /// <summary>
@@ -35,38 +38,58 @@ public static class SecurityAlgorithmRegistry
     ///   The key is the <see cref="SecurityAlgorithm"/>.
     ///   The value is th <see cref="Metadata"/>.
     /// </remarks>
-    public static Dictionary<SecurityAlgorithm, Metadata> Algorithms;
+    public readonly static Dictionary<SecurityAlgorithm, Metadata> Algorithms;
 
 
     static SecurityAlgorithmRegistry()
     {
-        Algorithms = new Dictionary<SecurityAlgorithm, Metadata>();
-        Algorithms.Add(SecurityAlgorithm.RSASHA1, new Metadata
+        Algorithms = new Dictionary<SecurityAlgorithm, Metadata>
         {
-            HashAlgorithm = DigestType.Sha1,
-        });
-        Algorithms.Add(SecurityAlgorithm.RSASHA256, new Metadata
-        {
-            HashAlgorithm = DigestType.Sha256,
-        });
-        Algorithms.Add(SecurityAlgorithm.RSASHA512, new Metadata
-        {
-            HashAlgorithm = DigestType.Sha512,
-        });
-        Algorithms.Add(SecurityAlgorithm.DSA, new Metadata
-        {
-            HashAlgorithm = DigestType.Sha1,
-        });
-        Algorithms.Add(SecurityAlgorithm.ECDSAP256SHA256, new Metadata
-        {
-            HashAlgorithm = DigestType.Sha256,
-            OtherNames = new string[] { "nistP256", "ECDSA_P256" },
-        });
-        Algorithms.Add(SecurityAlgorithm.ECDSAP384SHA384, new Metadata
-        {
-            HashAlgorithm = DigestType.Sha384,
-            OtherNames = new string[] { "nistP384", "ECDSA_P384" },
-        });
+            {
+                SecurityAlgorithm.RSASHA1,
+                new Metadata
+                {
+                    HashAlgorithm = DigestType.Sha1,
+                }
+            },
+            {
+                SecurityAlgorithm.RSASHA256,
+                new Metadata
+                {
+                    HashAlgorithm = DigestType.Sha256,
+                }
+            },
+            {
+                SecurityAlgorithm.RSASHA512,
+                new Metadata
+                {
+                    HashAlgorithm = DigestType.Sha512,
+                }
+            },
+            {
+                SecurityAlgorithm.DSA,
+                new Metadata
+                {
+                    HashAlgorithm = DigestType.Sha1,
+                }
+            },
+            {
+                SecurityAlgorithm.ECDSAP256SHA256,
+                new Metadata
+                {
+                    HashAlgorithm = DigestType.Sha256,
+                    OtherNames = ["nistP256", "ECDSA_P256"],
+                }
+            },
+            {
+                SecurityAlgorithm.ECDSAP384SHA384,
+                new Metadata
+                {
+                    HashAlgorithm = DigestType.Sha384,
+                    OtherNames = ["nistP384", "ECDSA_P384"],
+                }
+            }
+        };
 
         Algorithms.Add(SecurityAlgorithm.RSASHA1NSEC3SHA1, Algorithms[SecurityAlgorithm.RSASHA1]);
         Algorithms.Add(SecurityAlgorithm.DSANSEC3SHA1, Algorithms[SecurityAlgorithm.DSA]);
@@ -87,7 +110,7 @@ public static class SecurityAlgorithmRegistry
     /// </exception>
     public static Metadata GetMetadata(SecurityAlgorithm algorithm)
     {
-        if (Algorithms.TryGetValue(algorithm, out Metadata metadata))
+        if (Algorithms.TryGetValue(algorithm, out Metadata? metadata))
         {
             return metadata;
         }

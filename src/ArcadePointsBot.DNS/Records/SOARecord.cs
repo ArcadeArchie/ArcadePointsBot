@@ -25,28 +25,16 @@ namespace ArcadePointsBot.DNS.Records;
 public class SOARecord : ResourceRecord
 {
     /// <summary>
-    ///   Creates a new instance of the <see cref="SOARecord"/> class.
-    /// </summary>
-    /// <remarks>
-    ///   Sets <see cref="ResourceRecord.TTL"/> to zero.
-    /// </remarks>
-    public SOARecord() : base()
-    {
-        Type = DnsType.SOA;
-        TTL = TimeSpan.FromSeconds(0);
-    }
-
-    /// <summary>
     ///  The domain-name of the name server that was the
     ///  original or primary source of data for this zone.
     /// </summary>
-    public DomainName PrimaryName { get; set; }
+    public DomainName? PrimaryName { get; set; }
 
     /// <summary>
     ///  A domain-name which specifies the mailbox of the
     ///  person responsible for this zone.
     /// </summary>
-    public DomainName Mailbox { get; set; }
+    public DomainName? Mailbox { get; set; }
 
     /// <summary>
     ///  The unsigned 32 bit version number of the original copy
@@ -80,6 +68,18 @@ public class SOARecord : ResourceRecord
     ///  Minimum TTL field that should be exported with any RR from this zone.
     /// </summary>
     public TimeSpan Minimum { get; set; }
+
+    /// <summary>
+    ///   Creates a new instance of the <see cref="SOARecord"/> class.
+    /// </summary>
+    /// <remarks>
+    ///   Sets <see cref="ResourceRecord.TTL"/> to zero.
+    /// </remarks>
+    public SOARecord() : base()
+    {
+        Type = DnsType.SOA;
+        TTL = TimeSpan.FromSeconds(0);
+    }
 
     /// <inheritdoc />
     public override void ReadData(WireReader reader, int length)

@@ -15,20 +15,21 @@ namespace ArcadePointsBot.DNS.Records;
 public abstract class AddressRecord : ResourceRecord
 {
     /// <summary>
+    ///   The Internet address.
+    /// </summary>
+    /// <value>
+    ///   Either IPv4 or IPv6.
+    /// </value>
+    public IPAddress Address { get; set; } = null!;
+
+    
+    /// <summary>
     ///   Creates a new instance of the <see cref="AddressRecord"/> class.
     /// </summary>
     public AddressRecord() : base()
     {
         TTL = DefaultHostTTL;
     }
-
-    /// <summary>
-    ///   The Internet address.
-    /// </summary>
-    /// <value>
-    ///   Either IPv4 or IPv6.
-    /// </value>
-    public IPAddress Address { get; set; }
 
     /// <summary>
     ///   Creates an A or AAAA record based on the <see cref="AddressFamily"/>.

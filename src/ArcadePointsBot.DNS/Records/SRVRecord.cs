@@ -11,13 +11,6 @@ namespace ArcadePointsBot.DNS.Records;
 /// </summary>
 public class SRVRecord : ResourceRecord
 {
-    /// <summary>
-    ///   Creates a new instance of the <see cref="SRVRecord"/> class.
-    /// </summary>
-    public SRVRecord() : base()
-    {
-        Type = DnsType.SRV;
-    }
 
     /// <summary>
     ///  The priority of this target host.
@@ -54,7 +47,15 @@ public class SRVRecord : ResourceRecord
     ///   address records for this name, the name MUST NOT be an alias (in
     ///   the sense of RFC 1034 or RFC 2181).
     /// </remarks>
-    public DomainName Target { get; set; }
+    public DomainName? Target { get; set; }
+    
+    /// <summary>
+    ///   Creates a new instance of the <see cref="SRVRecord"/> class.
+    /// </summary>
+    public SRVRecord() : base()
+    {
+        Type = DnsType.SRV;
+    }
 
     /// <inheritdoc />
     public override void ReadData(WireReader reader, int length)

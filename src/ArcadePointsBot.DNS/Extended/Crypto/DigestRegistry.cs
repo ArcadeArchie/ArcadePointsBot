@@ -28,11 +28,13 @@ public static class DigestRegistry
 
     static DigestRegistry()
     {
-        Digests = new Dictionary<DigestType, Func<HashAlgorithm>>();
-        Digests.Add(DigestType.Sha1, () => SHA1.Create());
-        Digests.Add(DigestType.Sha256, () => SHA256.Create());
-        Digests.Add(DigestType.Sha384, () => SHA384.Create());
-        Digests.Add(DigestType.Sha512, () => SHA512.Create());
+        Digests = new Dictionary<DigestType, Func<HashAlgorithm>>
+        {
+            { DigestType.Sha1, SHA1.Create },
+            { DigestType.Sha256, SHA256.Create },
+            { DigestType.Sha384, SHA384.Create },
+            { DigestType.Sha512, SHA512.Create }
+        };
     }
 
     /// <summary>
@@ -50,7 +52,7 @@ public static class DigestRegistry
     /// </exception>
     public static HashAlgorithm Create(DigestType digestType)
     {
-        if (Digests.TryGetValue(digestType, out Func<HashAlgorithm> maker))
+        if (Digests.TryGetValue(digestType, out Func<HashAlgorithm>? maker))
         {
             return maker();
         }

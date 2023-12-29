@@ -18,6 +18,13 @@ namespace ArcadePointsBot.DNS.Records;
 /// </remarks>
 public class PTRRecord : ResourceRecord
 {
+
+    /// <summary>
+    ///  A domain-name which points to some location in the
+    ///  domain name space.
+    /// </summary>
+    public DomainName? DomainName { get; set; }
+
     /// <summary>
     ///   Creates a new instance of the <see cref="PTRRecord"/> class.
     /// </summary>
@@ -25,12 +32,6 @@ public class PTRRecord : ResourceRecord
     {
         Type = DnsType.PTR;
     }
-
-    /// <summary>
-    ///  A domain-name which points to some location in the
-    ///  domain name space.
-    /// </summary>
-    public DomainName DomainName { get; set; }
 
 
     /// <inheritdoc />

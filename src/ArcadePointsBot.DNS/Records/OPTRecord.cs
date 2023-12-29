@@ -1,5 +1,7 @@
 ﻿using ArcadePointsBot.DNS.Extended;
 using ArcadePointsBot.DNS.Serialization;
+using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Text;
 using System.Xml.Linq;
@@ -145,7 +147,7 @@ public class OPTRecord : ResourceRecord
             int olength = reader.ReadUInt16();
 
             EdnsOption option;
-            if (EdnsOptionRegistry.Options.TryGetValue(type, out Func<EdnsOption> maker))
+            if (EdnsOptionRegistry.Options.TryGetValue(type, out Func<EdnsOption>? maker))
             {
                 option = maker();
             }

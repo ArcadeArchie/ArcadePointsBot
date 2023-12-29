@@ -1,5 +1,7 @@
 ﻿using ArcadePointsBot.DNS.Multicast;
 using ArcadePointsBot.DNS.Records;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 
 namespace ArcadePointsBot.DNS;

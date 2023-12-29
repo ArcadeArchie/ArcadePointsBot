@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Buffers.Text;
-using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
+using System.IO;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using ArcadePointsBot.DNS.Records;
 
 namespace ArcadePointsBot.DNS.Serialization;
@@ -15,9 +11,9 @@ namespace ArcadePointsBot.DNS.Serialization;
 /// </summary>
 public class PresentationWriter
 {
-    static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    //static readonly DateTime UnixEpoch = new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    TextWriter text;
+    readonly TextWriter _text;
 
     /// <summary>
     ///   Creates a new instance of the <see cref="PresentationWriter"/> using the
@@ -28,7 +24,7 @@ public class PresentationWriter
     /// </param>
     public PresentationWriter(TextWriter text)
     {
-        this.text = text;
+        _text = text;
     }
 
     /// <summary>
@@ -36,7 +32,7 @@ public class PresentationWriter
     /// </summary>
     public void WriteSpace()
     {
-        text.Write(' ');
+        _text.Write(' ');
     }
 
     /// <summary>
@@ -44,7 +40,7 @@ public class PresentationWriter
     /// </summary>
     public void WriteEndOfLine()
     {
-        text.Write("\r\n");
+        _text.Write("\r\n");
     }
 
     /// <summary>
@@ -58,7 +54,7 @@ public class PresentationWriter
     /// </param>
     public void WriteByte(byte value, bool appendSpace = true)
     {
-        text.Write(value);
+        _text.Write(value);
         if (appendSpace)
             WriteSpace();
     }
@@ -74,7 +70,7 @@ public class PresentationWriter
     /// </param>
     public void WriteUInt16(ushort value, bool appendSpace = true)
     {
-        text.Write(value);
+        _text.Write(value);
         if (appendSpace)
             WriteSpace();
     }
@@ -90,7 +86,7 @@ public class PresentationWriter
     /// </param>
     public void WriteUInt32(uint value, bool appendSpace = true)
     {
-        text.Write(value);
+        _text.Write(value);
         if (appendSpace)
             WriteSpace();
     }
@@ -107,23 +103,22 @@ public class PresentationWriter
     /// <remarks>
     ///   Quotes and escapes are added as needned.
     /// </remarks>
-    public void WriteString(string value, bool appendSpace = true)
+    public void WriteString(string? value, bool appendSpace = true)
     {
         bool needQuote = false;
 
-        if (value == null)
-            value = string.Empty;
-        if (value == string.Empty)
+        value ??= string.Empty;
+        if (string.IsNullOrEmpty(value))
             needQuote = true;
         value = value.Replace("\\", "\\\\").Replace("\"", "\\\"");
         if (value.Contains(' '))
             needQuote = true;
 
         if (needQuote)
-            text.Write('"');
-        text.Write(value);
+            _text.Write('"');
+        _text.Write(value);
         if (needQuote)
-            text.Write('"');
+            _text.Write('"');
         if (appendSpace)
             WriteSpace();
     }
@@ -140,9 +135,9 @@ public class PresentationWriter
     /// <remarks>
     ///   Quotes and escapes are NOT added.
     /// </remarks>
-    public void WriteStringUnencoded(string value, bool appendSpace = true)
+    public void WriteStringUnencoded(string? value, bool appendSpace = true)
     {
-        text.Write(value);
+        _text.Write(value);
         if (appendSpace)
             WriteSpace();
     }
@@ -156,9 +151,9 @@ public class PresentationWriter
     /// <param name="appendSpace">
     ///   Write a space after the value.
     /// </param>
-    public void WriteDomainName(DomainName value, bool appendSpace = true)
+    public void WriteDomainName(DomainName? value, bool appendSpace = true)
     {
-        WriteStringUnencoded(value.ToString(), appendSpace);
+        WriteStringUnencoded(value?.ToString(), appendSpace);
     }
 
     /// <summary>
@@ -170,7 +165,7 @@ public class PresentationWriter
     /// <param name="appendSpace">
     ///   Write a space after the value.
     /// </param>
-    public void WriteBase16String(byte[] value, bool appendSpace = true)
+    public void WriteBase16String(byte[]? value, bool appendSpace = true)
     {
         WriteString(Base16.LowerCase.Encode(value), appendSpace);
     }
@@ -184,9 +179,9 @@ public class PresentationWriter
     /// <param name="appendSpace">
     ///   Write a space after the value.
     /// </param>
-    public void WriteBase64String(byte[] value, bool appendSpace = true)
+    public void WriteBase64String(byte[]? value, bool appendSpace = true)
     {
-        WriteString(Convert.ToBase64String(value), appendSpace);
+        WriteString(value is null ? null : Convert.ToBase64String(value), appendSpace);
     }
 
     /// <summary>
@@ -240,9 +235,9 @@ public class PresentationWriter
     /// <param name="appendSpace">
     ///   Write a space after the value.
     /// </param>
-    public void WriteIPAddress(IPAddress value, bool appendSpace = true)
+    public void WriteIPAddress(IPAddress? value, bool appendSpace = true)
     {
-        WriteString(value.ToString(), appendSpace);
+        WriteString(value?.ToString(), appendSpace);
     }
 
     /// <summary>
@@ -262,9 +257,9 @@ public class PresentationWriter
     {
         if (!Enum.IsDefined(typeof(DnsType), value))
         {
-            text.Write("TYPE");
+            _text.Write("TYPE");
         }
-        text.Write(value);
+        _text.Write(value);
         if (appendSpace)
             WriteSpace();
     }
@@ -286,9 +281,9 @@ public class PresentationWriter
     {
         if (!Enum.IsDefined(typeof(DnsClass), value))
         {
-            text.Write("CLASS");
+            _text.Write("CLASS");
         }
-        text.Write(value);
+        _text.Write(value);
         if (appendSpace)
             WriteSpace();
     }

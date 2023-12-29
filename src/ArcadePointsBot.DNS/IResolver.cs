@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Threading;
 using System.Threading.Tasks;
 
 namespace ArcadePointsBot.DNS;
@@ -25,5 +22,5 @@ public interface IResolver
     ///   A task that represents the asynchronous operation. The task's value is
     ///   the <see cref="Message"/> response to the <paramref name="request"/>.
     /// </returns>
-    Task<Message> ResolveAsync(Message request, CancellationToken cancel = default);
+    Task<Message?> ResolveAsync(Message request, CancellationToken cancel = default);
 }
