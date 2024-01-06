@@ -19,19 +19,21 @@ public static class EnumUtils
     {
         string? description;
         string? help = null;
-        
+
         var attributes = value.GetType().GetField(value.ToString())?.GetCustomAttributes(typeof(DescriptionAttribute), false);
-        if (attributes?.Any() ?? false)
+        if (attributes?.Length > 0)
         {
-            description = Resources.Enums.ResourceManager.GetString((attributes.First() as DescriptionAttribute)!.Description, Resources.Enums.Culture);
+            var attributeValue = (attributes[0] as DescriptionAttribute)!.Description;
+            var descriptionValue = Resources.Enums.ResourceManager.GetString(attributeValue, Resources.Enums.Culture);
+            description = descriptionValue is null ? attributeValue : descriptionValue;
         }
         else
         {
             TextInfo ti = CultureInfo.CurrentCulture.TextInfo;
             description = ti.ToTitleCase(ti.ToLower(value.ToString().Replace("_", " ")));
         }
-        
-        if(description!.IndexOf(';') is var index && index != -1)
+
+        if (description.IndexOf(';') is var index && index != -1)
         {
             help = description.Substring(index + 1);
             description = description.Substring(0, index);
@@ -89,18 +91,18 @@ public class EnumDescriptionConverter : IValueConverter
 {
     public object? Convert(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if(value is null) return null;
+        if (value is null) return null;
         if (value.GetType().IsEnum)
         {
             return ((Enum)value).ToDescription();
         }
         throw new ArgumentException("Convert:Value must be an enum.");
     }
-    
+
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if(value is null) return null;
-        if(value is EnumDescription enumDescription)
+        if (value is null) return null;
+        if (value is EnumDescription enumDescription)
         {
             return enumDescription.Value;
         }
@@ -122,10 +124,10 @@ public class EnumDescriptionsConverter : IValueConverter
         }
         throw new ArgumentException("Convert:Value must be an enum.");
     }
-    
+
     public object? ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
     {
-        if(value is IEnumerable<EnumDescription> enumDescriptions)
+        if (value is IEnumerable<EnumDescription> enumDescriptions)
         {
             return enumDescriptions.Select(x => x.Value);
         }
@@ -137,10 +139,10 @@ public record EnumDescription
 {
     public object Value { get; set; } = null!;
 
-    public string Description { get; set; }= null!;
-    
+    public string Description { get; set; } = null!;
+
     public string? Help { get; set; }
-    
+
     public override string ToString()
     {
         return Description;
