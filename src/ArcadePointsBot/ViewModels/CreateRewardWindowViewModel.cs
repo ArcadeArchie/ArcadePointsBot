@@ -57,6 +57,39 @@ namespace ArcadePointsBot.ViewModels
             AddActionCommand = ReactiveCommand.Create(() => Actions.Add(new RewardActionViewModel(Actions.Count)));
             DupeActionCommand = ReactiveCommand.Create<RewardActionViewModel>(DuplicateAction);
             RemoveActionCommand = ReactiveCommand.Create<RewardActionViewModel>(action => Actions.Remove(action));
+
+            Actions.CollectionChanged += Actions_CollectionChanged;
+        }
+
+        private void Actions_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs args)
+        {
+            if (args.OldItems != null)
+                foreach (RewardActionViewModel oldItem in args.OldItems)
+                    oldItem.PropertyChanged -= ActionItemChanged;
+            if (args.NewItems != null)
+                foreach (RewardActionViewModel newItem in args.NewItems)
+                    newItem.PropertyChanged += ActionItemChanged;
+        }
+
+        private void ActionItemChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName != nameof(RewardActionViewModel.ActionType))
+                return;
+            if (sender is RewardActionViewModel vm)
+            {
+                Actions.Remove(vm);
+                Actions.Add(vm.ActionType switch
+                {
+                    ActionType.Elgato => new ElgatoRewardActionVM(vm.Index)
+                    {
+                        Id = vm.Id,
+                        ActionType = ActionType.Elgato,
+                        ActionKeyType = vm.ActionKeyType is null ? ElgatoActionType.TurnOn : (ElgatoActionType)vm.ActionKeyType,
+                        Duration = vm.Duration,
+                    },
+                    _ => vm
+                });
+            }
         }
 
         void DuplicateAction(RewardActionViewModel action)
@@ -76,7 +109,7 @@ namespace ArcadePointsBot.ViewModels
             Errors.Clear();
             var result = await _pointRewardService
                 .CreateReward(Title!, Category, Cost, RequireInput, Actions);
-            if(result.IsSuccess)
+            if (result.IsSuccess)
                 return result.Value;
             Errors.Add(result.Error);
             return null;

@@ -1,8 +1,5 @@
 ﻿using ReactiveUI;
 using ArcadePointsBot.Models;
-using ArcadePointsBot.Util;
-using System.Collections;
-using Avalonia.Input;
 using ReactiveUI.Fody.Helpers;
 using System;
 
@@ -32,6 +29,15 @@ public class RewardActionViewModel : ReactiveObject
     {
         switch (action)
         {
+            case ElgatoRewardAction actual:
+                return new RewardActionViewModel(action.Index)
+                {
+                    Id = action.Id,
+                    Duration = action.Duration,
+                    ActionType = Models.ActionType.Elgato,
+                    ActionKeyType = actual.ActionType,
+                    ActionKey = null,
+                };
             case MouseRewardAction actual:
                 return new RewardActionViewModel(action.Index)
                 {

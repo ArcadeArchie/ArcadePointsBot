@@ -31,6 +31,18 @@
                   SelectedItem="{Binding ActionKey, Converter={StaticResource EnumDescriptionConverter}}"
                   ItemsSource="{Binding Source={util:EnumBindingSource {x:Type Key}}, Converter={StaticResource EnumDescriptionsConverter}}"/>
       </StackPanel>
+      
+      
+      <StackPanel Name="Elgato" Orientation="Horizontal" IsVisible="False">
+        <ComboBox VerticalAlignment="Center" Margin="0,0,10,0" SelectedItem="{Binding ActionKeyType, Converter={StaticResource EnumDescriptionConverter}}"
+                  PlaceholderText="{x:Static assets:L10n.Action_Key_Type}"
+                  ItemsSource="{Binding Source={util:EnumBindingSource {x:Type models:ElgatoActionType}}, Converter={StaticResource EnumDescriptionsConverter}}"/>
+        <NumericUpDown VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="150"
+                       Name="DurationElgato" Watermark="{x:Static assets:L10n.Action_Duration}" Minimum="100" Increment="1" Value="{Binding Duration}"/>
+       <NumericUpDown VerticalAlignment="Center" Margin="0,0,10,0" MinWidth="150"
+                       Name="ChangeValueElgato" Watermark="{x:Static assets:L10n.Action_Duration}" Minimum="100" Increment="1" Value="{Binding Duration}"/>
+      </StackPanel>
+      
       <StackPanel Name="Mouse" Orientation="Horizontal" IsVisible="False">
         <ComboBox VerticalAlignment="Center" Margin="0,0,10,0"
                   PlaceholderText="{x:Static assets:L10n.Action_Mouse_Action}"
@@ -76,10 +88,17 @@
     <ia:DataTriggerBehavior Binding="{Binding ActionType}" ComparisonCondition="Equal" Value="{StaticResource KeyboardAction}">
       <ia:ChangePropertyAction TargetObject="{Binding #Keyboard}" PropertyName="IsVisible" Value="True"/>
       <ia:ChangePropertyAction TargetObject="{Binding #Mouse}" PropertyName="IsVisible" Value="False"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #Elgato}" PropertyName="IsVisible" Value="False"/>
     </ia:DataTriggerBehavior>
     <ia:DataTriggerBehavior Binding="{Binding ActionType}" ComparisonCondition="Equal" Value="{StaticResource MouseAction}">
+      <ia:ChangePropertyAction TargetObject="{Binding #Elgato}" PropertyName="IsVisible" Value="False"/>
       <ia:ChangePropertyAction TargetObject="{Binding #Keyboard}" PropertyName="IsVisible" Value="False"/>
       <ia:ChangePropertyAction TargetObject="{Binding #Mouse}" PropertyName="IsVisible" Value="True"/>
+    </ia:DataTriggerBehavior>
+    <ia:DataTriggerBehavior Binding="{Binding ActionType}" ComparisonCondition="Equal" Value="{StaticResource ElgatoAction}">
+      <ia:ChangePropertyAction TargetObject="{Binding #Elgato}" PropertyName="IsVisible" Value="True"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #Keyboard}" PropertyName="IsVisible" Value="False"/>
+      <ia:ChangePropertyAction TargetObject="{Binding #Mouse}" PropertyName="IsVisible" Value="False"/>
     </ia:DataTriggerBehavior>
   </i:Interaction.Behaviors>
 </UserControl>
