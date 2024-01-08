@@ -25,6 +25,7 @@ namespace ArcadePointsBot.Models
 
         public IList<KeyboardRewardAction> KeyboardActions { get; init; } = new List<KeyboardRewardAction>();
         public IList<MouseRewardAction> MouseActions { get; init; } = new List<MouseRewardAction>();
+        public IList<ElgatoRewardAction> ElgatoActions { get; init; } = new List<ElgatoRewardAction>();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 

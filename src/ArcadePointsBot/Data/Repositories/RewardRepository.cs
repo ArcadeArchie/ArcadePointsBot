@@ -12,12 +12,23 @@ namespace ArcadePointsBot.Data.Repositories
         {
         }
 
-        
-        public new TwitchReward? Find(string id) {
+
+        public new TwitchReward? Find(string id)
+        {
             return _entities.Find(id);
         }
-        public new Task<TwitchReward?> FindAsync(string id) {
-            return _entities.Include(x => x.KeyboardActions).Include(x => x.MouseActions).FirstOrDefaultAsync(x => x.Id == id);
+        public new async Task<TwitchReward?> FindAsync(string id, bool track = false)
+        {
+            if (track)
+                return await _entities
+                .Include(x => x.KeyboardActions)
+                .Include(x => x.ElgatoActions)
+                .Include(x => x.MouseActions)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            var entity = await _entities.FindAsync(id);
+            if (entity != null)
+                _context.Entry(entity).State = EntityState.Detached;
+            return entity;
         }
     }
 }

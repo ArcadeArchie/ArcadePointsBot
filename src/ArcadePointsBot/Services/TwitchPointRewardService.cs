@@ -59,6 +59,10 @@ namespace ArcadePointsBot.Services
                 dbEntry.KeyboardActions.AddRange(actions
                     .Where(x => x.ActionType == ActionType.Keyboard)
                     .Select(x => KeyboardRewardAction.FromVMType(dbEntry, x)).ToList());
+                
+                dbEntry.ElgatoActions.AddRange(actions
+                    .Where(x => x.ActionType == ActionType.Elgato)
+                    .Select(x => ElgatoRewardAction.FromVMType(dbEntry, x)).ToList());
                 dbEntry.MouseActions.AddRange(actions
                     .Where(x => x.ActionType == ActionType.Mouse)
                     .Select(x => MouseRewardAction.FromVMType(dbEntry, x)).ToList());
@@ -132,7 +136,7 @@ namespace ArcadePointsBot.Services
                     }, accessToken: _twitchAuthService.AuthConfig.AccessToken);
 
                 var transaction = _rewardRepository.UnitOfWork.BeginTransaction();
-                var dbEntry = await _rewardRepository.FindAsync(reward.Id);
+                var dbEntry = await _rewardRepository.FindAsync(reward.Id, true);
                 if (dbEntry is null) return Result.Failure<TwitchReward>(Errors.Database.NotFound);
                 dbEntry.KeyboardActions.Clear();
                 dbEntry.MouseActions.Clear();

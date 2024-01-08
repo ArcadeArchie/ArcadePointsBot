@@ -36,7 +36,7 @@ public class ElgatoRewardAction : RewardAction<ElgatoActionType>
     {
         if (actionVM is ElgatoRewardActionVM vm)
         {
-            return new(Guid.NewGuid().ToString(), vm.Index, reward, vm.ActionKeyType, vm.Duration, vm.ChangeValue);
+            return new(Guid.NewGuid().ToString(), vm.Index, reward, (ElgatoActionType)actionVM.ActionKeyType!, vm.Duration, vm.ChangeValue);
         }
         var actionType = (ElgatoActionType)actionVM.ActionKeyType!;
         return new(Guid.NewGuid().ToString(), actionVM.Index, reward, actionType, actionVM.Duration);
