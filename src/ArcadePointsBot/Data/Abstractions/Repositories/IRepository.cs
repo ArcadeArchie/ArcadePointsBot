@@ -21,7 +21,7 @@ public interface IEntityRepository<T, TId> : IReadRepository<T>, IWriteRepositor
     /// </summary>
     /// <param name="id"></param>
     /// <returns></returns>
-    Task<T?> FindAsync(TId id);
+    Task<T?> FindAsync(TId id, bool track = false);
 }
 
 public interface IRepository<T, TId> where T : IEntity<TId>

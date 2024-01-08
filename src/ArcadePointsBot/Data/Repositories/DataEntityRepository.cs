@@ -114,9 +114,14 @@ namespace ArcadePointsBot.Data.Repositories
             return _entities.Find(id);
         }
 
-        public async Task<T?> FindAsync(TId id)
+        public async Task<T?> FindAsync(TId id, bool track = false)
         {
-            return await _entities.FindAsync(id);
+            if (track)
+                return await _entities.FindAsync(id);
+            var entity = await _entities.FindAsync(id);
+            if (entity != null)
+                _context.Entry(entity).State = EntityState.Detached;
+            return entity;
         }
 
         private IQueryable<T> GetEntities(bool asNoTracking = true)
