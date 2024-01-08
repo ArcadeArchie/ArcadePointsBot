@@ -30,13 +30,14 @@ public class RewardActionViewModel : ReactiveObject
         switch (action)
         {
             case ElgatoRewardAction actual:
-                return new RewardActionViewModel(action.Index)
+                return new ElgatoRewardActionVM(action.Index)
                 {
                     Id = action.Id,
                     Duration = action.Duration,
                     ActionType = Models.ActionType.Elgato,
                     ActionKeyType = actual.ActionType,
                     ActionKey = null,
+                    ChangeValue = actual.ChangeValue
                 };
             case MouseRewardAction actual:
                 return new RewardActionViewModel(action.Index)
