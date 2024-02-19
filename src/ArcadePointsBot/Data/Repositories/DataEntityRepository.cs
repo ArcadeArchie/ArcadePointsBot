@@ -2,12 +2,14 @@
 using ArcadePointsBot.Data.Abstractions.Repositories;
 using ArcadePointsBot.Data.Contexts;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using TwitchLib.Api.Helix.Models.Soundtrack;
 
 namespace ArcadePointsBot.Data.Repositories
 {
@@ -108,6 +110,9 @@ namespace ArcadePointsBot.Data.Repositories
                 Update(entity);
             }
         }
+
+        public Task<int> ExecuteUpdate(IEnumerable<T> entities, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setPropertyCalls)
+            => _entities.Where(x => entities.Contains(x)).ExecuteUpdateAsync(setPropertyCalls);
 
         public T? Find(TId id)
         {

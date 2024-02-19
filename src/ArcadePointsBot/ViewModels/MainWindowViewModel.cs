@@ -161,24 +161,34 @@ namespace ArcadePointsBot.ViewModels
 
         internal async Task BulkDisable(List<string> toDisableIds)
         {
-            foreach (var id in toDisableIds)
-            {
-                var reward = _rewardList.FirstOrDefault(x => x.Id == id);
-                if (reward is null) return;
-                reward.IsEnabled = false;
-                await _rewardService.UpdateReward(reward);
-            }
+            if(toDisableIds.Count == 0) return;
+            await _rewardService.BulkUpdateRewards(
+                _rewardList
+                .Where(x => toDisableIds.Contains(x.Id))
+                .Select(x => { x.IsEnabled = false; return x; }), u => u.SetProperty(p => p.IsEnabled, false));
+            //foreach (var id in toDisableIds)
+            //{
+            //    var reward = _rewardList.FirstOrDefault(x => x.Id == id);
+            //    if (reward is null) return;
+            //    reward.IsEnabled = false;
+            //    await _rewardService.UpdateReward(reward);
+            //}
         }
 
         internal async Task BulkEnable(List<string> toEnableIds)
         {
-            foreach (var id in toEnableIds)
-            {
-                var reward = _rewardList.FirstOrDefault(x => x.Id == id);
-                if (reward is null) return;
-                reward.IsEnabled = true;
-                await _rewardService.UpdateReward(reward);
-            }
+            if(toEnableIds.Count == 0) return;
+            await _rewardService.BulkUpdateRewards(
+                _rewardList
+                .Where(x => toEnableIds.Contains(x.Id))
+                .Select(x => { x.IsEnabled = true; return x; }), u => u.SetProperty(p => p.IsEnabled, true));
+            //foreach (var id in toEnableIds)
+            //{
+            //    var reward = _rewardList.FirstOrDefault(x => x.Id == id);
+            //    if (reward is null) return;
+            //    reward.IsEnabled = true;
+            //    await _rewardService.UpdateReward(reward);
+            //}
         }
 
         internal async void StopWorker()

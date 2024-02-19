@@ -3,10 +3,12 @@ using ArcadePointsBot.Data.Abstractions.Repositories;
 using ArcadePointsBot.Models;
 using ArcadePointsBot.ViewModels;
 using DynamicData;
+using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using TwitchLib.Api;
@@ -191,6 +193,31 @@ namespace ArcadePointsBot.Services
                 IsUserInputRequired = reward.RequireInput,
             }, accessToken: _twitchAuthService.AuthConfig.AccessToken);
         }
+
+
+        public async Task BulkUpdateRewards(
+            IEnumerable<TwitchReward> rewards,
+            Expression<Func<SetPropertyCalls<TwitchReward>, SetPropertyCalls<TwitchReward>>> setPropertyCalls)
+        {
+            await _rewardRepository
+                .ExecuteUpdate(rewards, setPropertyCalls);
+            await _rewardRepository.UnitOfWork.SaveChangesAsync();
+            
+            
+            foreach (TwitchReward reward in rewards)
+            {
+                await _twitchAuthService.EnsureValidTokenAsync();
+                await _apiClient.Helix.ChannelPoints.UpdateCustomRewardAsync(_twitchAuthService.AuthConfig.Uid, reward.Id, new UpdateCustomRewardRequest
+                {
+                    IsEnabled = reward.IsEnabled,
+                    Title = reward.Title,
+                    Cost = reward.Cost,
+                    IsUserInputRequired = reward.RequireInput,
+                }, accessToken: _twitchAuthService.AuthConfig.AccessToken);
+            }
+        }
+
+
         public async Task DeleteReward(TwitchReward reward)
         {
             try

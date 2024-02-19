@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.EntityFrameworkCore.Query;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -79,6 +80,8 @@ public interface IWriteRepository<T, TId> : IRepository<T, TId> where T : IEntit
     /// </summary>
     /// <param name="entities">The collection of entities to update</param>
     void UpdateRange(IEnumerable<T> entities);
+
+    public Task<int> ExecuteUpdate(IEnumerable<T> entities, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setPropertyCalls);
 }
 
 /// <summary>
