@@ -1,10 +1,10 @@
 ﻿using ReactiveUI;
-using ArcadePointsBot.Models;
 using ArcadePointsBot.Util;
 using System.Collections;
 using Avalonia.Input;
 using ReactiveUI.Fody.Helpers;
 using System;
+using ArcadePointsBot.Domain.Rewards;
 
 namespace ArcadePointsBot.ViewModels;
 
@@ -37,7 +37,7 @@ public class RewardActionViewModel : ReactiveObject
                 {
                     Id = action.Id,
                     Duration = action.Duration,
-                    ActionType = Models.ActionType.Mouse,
+                    ActionType = Domain.Rewards.ActionType.Mouse,
                     ActionKeyType = actual.ActionType,
                     ActionKey = actual.ActionKey,
                 };
@@ -46,7 +46,7 @@ public class RewardActionViewModel : ReactiveObject
                 {
                     Id = action.Id,
                     Duration = action.Duration,
-                    ActionType = Models.ActionType.Keyboard,
+                    ActionType = Domain.Rewards.ActionType.Keyboard,
                     ActionKeyType = actual.ActionType,
                     ActionKey = actual.ActionKey,
                 };

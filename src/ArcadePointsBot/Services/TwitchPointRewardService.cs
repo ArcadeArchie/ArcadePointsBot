@@ -1,6 +1,5 @@
 ﻿using ArcadePointsBot.Auth;
-using ArcadePointsBot.Data.Abstractions.Repositories;
-using ArcadePointsBot.Models;
+using ArcadePointsBot.Domain.Rewards;
 using ArcadePointsBot.ViewModels;
 using DynamicData;
 using Microsoft.EntityFrameworkCore.Query;

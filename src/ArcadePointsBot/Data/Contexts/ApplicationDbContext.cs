@@ -1,5 +1,5 @@
 ﻿using ArcadePointsBot.Data.Abstractions;
-using ArcadePointsBot.Models;
+using ArcadePointsBot.Domain.Rewards;
 using ArcadePointsBot.ViewModels;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;

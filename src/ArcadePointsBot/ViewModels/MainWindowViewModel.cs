@@ -2,7 +2,6 @@
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using ArcadePointsBot.Auth;
-using ArcadePointsBot.Models;
 using ArcadePointsBot.Services;
 using ArcadePointsBot.Views;
 using DynamicData;
@@ -18,6 +17,7 @@ using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using ArcadePointsBot.Domain.Rewards;
 
 namespace ArcadePointsBot.ViewModels
 {

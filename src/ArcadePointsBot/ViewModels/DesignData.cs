@@ -21,5 +21,5 @@ public static class DesignData
         ((App)Application.Current!).GlobalHost!.Services.GetRequiredService<CreateRewardWindowViewModel>();
 
     public static EditRewardViewModel EditRewardViewModel { get; } = new EditRewardViewModel(null, 
-        new ArcadePointsBot.Models.TwitchReward());
+        new ArcadePointsBot.Domain.Rewards.TwitchReward());
 }

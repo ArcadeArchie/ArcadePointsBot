@@ -1,12 +1,8 @@
 ﻿using Avalonia.Input;
-using ArcadePointsBot.Util;
-using ReactiveUI.Fody.Helpers;
-using ReactiveUI;
 using System;
-using System.Collections;
 using ArcadePointsBot.ViewModels;
 
-namespace ArcadePointsBot.Models;
+namespace ArcadePointsBot.Domain.Rewards;
 
 public class MouseRewardAction : RewardAction<MouseActionType, MouseButton>
 {
@@ -22,29 +18,9 @@ public class MouseRewardAction : RewardAction<MouseActionType, MouseButton>
     }
 
     public static MouseRewardAction FromVMType(TwitchReward reward, RewardActionViewModel actionVM)
-    {        
+    {
         var actionType = (MouseActionType)actionVM.ActionKeyType!;
         var key = (MouseButton)actionVM.ActionKey!;
         return new(Guid.NewGuid().ToString(), actionVM.Index, reward, actionVM.Duration, actionType, key);
-    }
-}
-
-public class MouseRewardActionVM : ReactiveObject
-{
-    public IEnumerable ActionValues { get; } = EnumUtils.GetValues<MouseActionType>();
-    public IEnumerable KeyValues { get; } = EnumUtils.GetValues<MouseButton>();
-
-    [Reactive] public int? Duration { get; set; }
-    [Reactive] public MouseActionType? ActionType { get; set; }
-    [Reactive] public MouseButton? ActionKey { get; set; }
-    public int Index { get; set; }
-    public MouseRewardActionVM()
-    {
-
-    }
-
-    public MouseRewardActionVM(int index)
-    {
-        Index = index;
     }
 }

@@ -1,8 +1,7 @@
-﻿using ArcadePointsBot.Data.Abstractions;
-using System;
+﻿using System;
 using System.ComponentModel;
 
-namespace ArcadePointsBot.Models;
+namespace ArcadePointsBot.Domain.Rewards;
 public abstract class RewardAction : IEntity<string>
 {
     public string Id { get; set; } = null!;

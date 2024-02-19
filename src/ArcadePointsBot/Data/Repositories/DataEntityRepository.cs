@@ -1,6 +1,7 @@
 ﻿using ArcadePointsBot.Data.Abstractions;
 using ArcadePointsBot.Data.Abstractions.Repositories;
 using ArcadePointsBot.Data.Contexts;
+using ArcadePointsBot.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System;

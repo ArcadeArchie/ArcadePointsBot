@@ -1,9 +1,7 @@
 ﻿using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using ArcadePointsBot.Auth;
-using ArcadePointsBot.Data.Abstractions.Repositories;
 using ArcadePointsBot.Interop.Windows;
-using ArcadePointsBot.Models;
 using ArcadePointsBot.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +22,7 @@ using TwitchLib.Api.Helix.Models.ChannelPoints.UpdateCustomRewardRedemptionStatu
 using TwitchLib.PubSub;
 using TwitchLib.PubSub.Events;
 using TwitchLib.PubSub.Models.Responses.Messages.Redemption;
+using ArcadePointsBot.Domain.Rewards;
 
 namespace ArcadePointsBot;
 

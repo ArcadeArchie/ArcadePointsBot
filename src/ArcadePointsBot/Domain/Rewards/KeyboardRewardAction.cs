@@ -6,7 +6,7 @@ using System;
 using System.Collections;
 using ArcadePointsBot.ViewModels;
 
-namespace ArcadePointsBot.Models;
+namespace ArcadePointsBot.Domain.Rewards;
 
 public class KeyboardRewardAction : RewardAction<KeyboardActionType, Key>
 {
@@ -27,25 +27,5 @@ public class KeyboardRewardAction : RewardAction<KeyboardActionType, Key>
         var actionType = (KeyboardActionType)actionVM.ActionKeyType!;
         var key = (Key)actionVM.ActionKey!;
         return new(Guid.NewGuid().ToString(), actionVM.Index, reward, actionVM.Duration, actionType, key);
-    }
-}
-
-public class KeyboardRewardActionVM : ReactiveObject
-{
-    public IEnumerable ActionValues { get; } = EnumUtils.GetValues<KeyboardActionType>();
-    public IEnumerable KeyValues { get; } = EnumUtils.GetValues<Key>();
-
-    [Reactive] public int? Duration { get; set; }
-    [Reactive] public KeyboardActionType? ActionType { get; set; }
-    [Reactive] public Key? ActionKey { get; set; }
-    public int Index { get; set; }
-    public KeyboardRewardActionVM()
-    {
-
-    }
-
-    public KeyboardRewardActionVM(int index)
-    {
-        Index = index;
     }
 }

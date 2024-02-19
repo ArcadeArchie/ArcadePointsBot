@@ -2,7 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="ArcadePointsBot.App"
              xmlns:local="using:ArcadePointsBot"
-             xmlns:models="using:ArcadePointsBot.Models"
+             xmlns:models="using:ArcadePointsBot.Domain.Rewards"
              RequestedThemeVariant="Dark">
   <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 

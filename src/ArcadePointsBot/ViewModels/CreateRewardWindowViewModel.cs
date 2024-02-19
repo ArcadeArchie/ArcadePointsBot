@@ -1,4 +1,4 @@
-﻿using ArcadePointsBot.Models;
+﻿using ArcadePointsBot.Domain.Rewards;
 using ArcadePointsBot.Services;
 using ArcadePointsBot.Util;
 using DynamicData;

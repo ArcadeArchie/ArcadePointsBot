@@ -1,9 +1,8 @@
-﻿using ArcadePointsBot.Data.Abstractions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.ComponentModel;
 using TwitchLib.Api.Helix.Models.ChannelPoints;
 
-namespace ArcadePointsBot.Models
+namespace ArcadePointsBot.Domain.Rewards
 {
     public class TwitchReward : IEntity<string>, INotifyPropertyChanged
     {

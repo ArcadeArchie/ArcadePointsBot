@@ -2,12 +2,12 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
-using ArcadePointsBot.Models;
 using ArcadePointsBot.ViewModels;
 using ReactiveUI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using System.Globalization;
+using ArcadePointsBot.Domain.Rewards;
 
 namespace ArcadePointsBot.Views
 {

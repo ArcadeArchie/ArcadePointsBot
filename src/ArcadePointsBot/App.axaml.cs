@@ -21,6 +21,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using ArcadePointsBot.Domain.Rewards;
 
 namespace ArcadePointsBot;
 public partial class App : Application

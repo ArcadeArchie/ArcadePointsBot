@@ -1,6 +1,5 @@
-﻿using ArcadePointsBot.Data.Abstractions.Repositories;
-using ArcadePointsBot.Data.Contexts;
-using ArcadePointsBot.Models;
+﻿using ArcadePointsBot.Data.Contexts;
+using ArcadePointsBot.Domain.Rewards;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
 

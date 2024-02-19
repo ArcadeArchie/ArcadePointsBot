@@ -6,7 +6,7 @@
              xmlns:util="clr-namespace:ArcadePointsBot.Util"
              xmlns:i="clr-namespace:Avalonia.Xaml.Interactivity;assembly=Avalonia.Xaml.Interactivity"
              xmlns:ia="clr-namespace:Avalonia.Xaml.Interactions.Core;assembly=Avalonia.Xaml.Interactions"
-             xmlns:models="using:ArcadePointsBot.Models"
+             xmlns:models="using:ArcadePointsBot.Domain.Rewards"
              xmlns:vm="using:ArcadePointsBot.ViewModels"
              mc:Ignorable="d" d:DesignWidth="820" MinHeight="50" MinWidth="400"
              x:Class="ArcadePointsBot.Views.RewardActionView"
