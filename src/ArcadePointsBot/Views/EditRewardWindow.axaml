@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:common="using:ArcadePointsBot.Common.Primitives"
         xmlns:local="using:ArcadePointsBot"
         xmlns:vm="using:ArcadePointsBot.ViewModels"
         xmlns:cc="using:ArcadePointsBot.Views"
@@ -38,7 +39,7 @@
     </DockPanel>
     <ListBox Grid.Row="1" ItemsSource="{Binding Errors}" Margin="5" CornerRadius="5" IsVisible="{Binding HasError}">
           <ListBox.ItemTemplate>
-            <DataTemplate x:DataType="local:Error">
+            <DataTemplate x:DataType="common:Error">
               <TextBlock Text="{Binding Message}"/>
             </DataTemplate>
           </ListBox.ItemTemplate>
