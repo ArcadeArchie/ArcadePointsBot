@@ -5,6 +5,7 @@ using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace ArcadePointsBot.Interop.Windows;
 
@@ -105,7 +106,7 @@ internal static class NativeMethods
 
     #endregion
 }
-
+[SupportedOSPlatform("windows")]
 public static class Keyboard
 {
     #region Public Members
@@ -217,6 +218,7 @@ public static class Keyboard
 }
 
 
+[SupportedOSPlatform("windows")]
 public static class Mouse
 {
     public static void Click(MouseButton mouseButton)

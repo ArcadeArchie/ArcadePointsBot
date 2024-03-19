@@ -22,6 +22,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using ArcadePointsBot.Domain.Rewards;
+using ArcadePointsBot.Infrastructure.Interop;
 
 namespace ArcadePointsBot;
 public partial class App : Application
@@ -156,6 +157,8 @@ public partial class App : Application
         services.AddScoped(typeof(IEntityRepository<,>), typeof(DataEntityRepository<,>));
         services.AddScoped<IRewardRepository, RewardRepository>();
 
+        services.AddSingleton<Mouse>();
+        services.AddSingleton<Keyboard>();
         services.AddSingleton<TwitchWorker>();
 
         services.AddTransient<ViewLocator>();
