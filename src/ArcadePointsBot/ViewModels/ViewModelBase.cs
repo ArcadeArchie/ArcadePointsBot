@@ -1,4 +1,5 @@
-﻿using Avalonia.Threading;
+﻿using ArcadePointsBot.Common.Primitives;
+using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
