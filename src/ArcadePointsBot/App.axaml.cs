@@ -109,6 +109,8 @@ public partial class App : Application
         if (Design.IsDesignMode)
             return;
         configurationBuilder.Sources.Clear();
+        configurationBuilder.AddEnvironmentVariables();
+
         configurationBuilder
             .SetBasePath(Directory.GetCurrentDirectory())
             .Add<WritableJsonConfigurationSource>(s =>
@@ -126,7 +128,6 @@ public partial class App : Application
             configurationBuilder.AddUserSecrets(Assembly.GetExecutingAssembly());
         }
 
-        configurationBuilder.AddEnvironmentVariables();
     }
     private static void WithApplicationServices(HostBuilderContext context, IServiceCollection services)
     {
