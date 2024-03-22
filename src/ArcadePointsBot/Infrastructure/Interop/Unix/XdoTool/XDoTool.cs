@@ -15,9 +15,10 @@ namespace ArcadePointsBot.Infrastructure.Interop.Unix.XdoTool
     public static class XDoTool
     {
         private const string EXE = "xdotool";
+        private static readonly string[] first = ["getactivewindow"];
 
         private static Task<BufferedCommandResult> Execute(params string[] args) =>
-            Cli.Wrap(EXE).WithArguments(args).ExecuteBufferedAsync();
+            Cli.Wrap(EXE).WithArguments(first.Concat(args)).ExecuteBufferedAsync();
 
         public static async Task<Result> KeyDown(Key key)
         {
@@ -39,7 +40,7 @@ namespace ArcadePointsBot.Infrastructure.Interop.Unix.XdoTool
 
         public static async Task<Result> MouseDown(MouseButton button)
         {
-            var res = await Execute("keyup", TransformButton(button));
+            var res = await Execute("mousedown", TransformButton(button));
             if (!res.IsSuccess)
                 return Result.Failure(new Error(res.ExitCode.ToString(), res.StandardError));
 
@@ -48,7 +49,7 @@ namespace ArcadePointsBot.Infrastructure.Interop.Unix.XdoTool
 
         public static async Task<Result> MouseUp(MouseButton button)
         {
-            var res = await Execute("keyup", TransformButton(button));
+            var res = await Execute("mouseup", TransformButton(button));
             if (!res.IsSuccess)
                 return Result.Failure(new Error(res.ExitCode.ToString(), res.StandardError));
 
