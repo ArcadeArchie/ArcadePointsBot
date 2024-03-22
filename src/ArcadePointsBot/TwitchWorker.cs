@@ -246,17 +246,24 @@ public class TwitchWorker : BackgroundService, INotifyPropertyChanged
 
     async Task CancelReward(Redemption redemption)
     {
-        await _twitchAuthService.EnsureValidTokenAsync();
-        await _apiClient.Helix.ChannelPoints.UpdateRedemptionStatusAsync(
-            _twitchAuthService.AuthConfig.Uid,
-            redemption.Reward.Id,
-            new List<string> { redemption.Id },
-            new UpdateCustomRewardRedemptionStatusRequest
-            {
-                Status = CustomRewardRedemptionStatus.CANCELED
-            },
-            accessToken: _twitchAuthService.AuthConfig.AccessToken
-        );
+        try
+        {
+            await _twitchAuthService.EnsureValidTokenAsync();
+            await _apiClient.Helix.ChannelPoints.UpdateRedemptionStatusAsync(
+                _twitchAuthService.AuthConfig.Uid,
+                redemption.Reward.Id,
+                new List<string> { redemption.Id },
+                new UpdateCustomRewardRedemptionStatusRequest
+                {
+                    Status = CustomRewardRedemptionStatus.CANCELED
+                },
+                accessToken: _twitchAuthService.AuthConfig.AccessToken
+            );
+        }
+        catch (Exception ex)
+        {
+            _logger.LogCritical(ex, "Failed to refund reward");
+        }
     }
 
     private void OnListenResponse(object? sender, TwitchLib.PubSub.Events.OnListenResponseArgs e)
