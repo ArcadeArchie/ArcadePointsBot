@@ -14,11 +14,11 @@ namespace ArcadePointsBot;
 public static class DesignData
 {
     public static MainWindowViewModel MainWindowViewModel { get; } = 
-        ((App)Application.Current!).GlobalHost!.Services.GetRequiredService<MainWindowViewModel>();
+        ((App)Avalonia.Application.Current!).GlobalHost!.Services.GetRequiredService<MainWindowViewModel>();
 
 
     public static CreateRewardWindowViewModel CreateRewardWindowViewModel { get; } =
-        ((App)Application.Current!).GlobalHost!.Services.GetRequiredService<CreateRewardWindowViewModel>();
+        ((App)Avalonia.Application.Current!).GlobalHost!.Services.GetRequiredService<CreateRewardWindowViewModel>();
 
     public static EditRewardViewModel EditRewardViewModel { get; } = new EditRewardViewModel(null, 
         new ArcadePointsBot.Domain.Rewards.TwitchReward());

@@ -58,37 +58,29 @@ public class TwitchWorker : BackgroundService, INotifyPropertyChanged
         }
     }
 
-    public TwitchWorker(
-        IAuthenticationService twitchAuthService,
-        ILoggerFactory loggerFactory,
-        ILogger<TwitchWorker> logger,
-        IServiceProvider provider,
-        IHostEnvironment env,
-        Keyboard keyboard,
-        Mouse mouse
-    )
+    public TwitchWorker(IServiceProvider provider)
     {
-        _env = env;
-        _twitchAuthService = twitchAuthService;
-        _rewardRepository = provider
-            .CreateScope()
-            .ServiceProvider.GetRequiredService<IRewardRepository>();
-        _logger = logger;
+        var scope = provider.CreateScope();
+        _logger = scope.ServiceProvider.GetRequiredService<ILogger<TwitchWorker>>();
+        _twitchAuthService = scope.ServiceProvider.GetRequiredService<IAuthenticationService>();
+        _rewardRepository = scope.ServiceProvider.GetRequiredService<IRewardRepository>();
+        _env = scope.ServiceProvider.GetRequiredService<IHostEnvironment>();
+        _keyboard = scope.ServiceProvider.GetRequiredService<Keyboard>();
+        _mouse = scope.ServiceProvider.GetRequiredService<Mouse>();
+
         _pubSubClient = new();
         _pubSubClient.OnPubSubServiceConnected += (_, _) =>
-            _pubSubClient.SendTopics(twitchAuthService.AuthConfig.AccessToken);
+            _pubSubClient.SendTopics(_twitchAuthService.AuthConfig.AccessToken);
         _pubSubClient.OnLog += OnLog;
         _pubSubClient.OnStreamUp += OnStreamUp;
         _pubSubClient.OnStreamDown += OnStreamDown;
         _pubSubClient.OnListenResponse += OnListenResponse;
         _pubSubClient.OnChannelPointsRewardRedeemed += OnChannelPointsRewardRedeemed;
-        _apiClient = new TwitchAPI(loggerFactory);
+        _apiClient = new TwitchAPI(scope.ServiceProvider.GetRequiredService<ILoggerFactory>());
         _apiClient.Settings.ClientId = _twitchAuthService.AuthConfig.ClientId;
         _apiClient.Settings.Secret = _twitchAuthService.AuthConfig.ClientSecret;
 
         PropertyChanged += ChangeActiveRewards;
-        _keyboard = keyboard;
-        _mouse = mouse;
     }
 
     private async void ChangeActiveRewards(object? sender, PropertyChangedEventArgs e)
@@ -378,6 +370,7 @@ public class TwitchWorker : BackgroundService, INotifyPropertyChanged
         _pubSubClient.OnChannelPointsRewardRedeemed -= OnChannelPointsRewardRedeemed;
         _pubSubClient.Disconnect();
         Status = WorkerStatus.Stopped;
+        _logger.LogInformation("Pubsub stopped");
         return base.StopAsync(cancellationToken);
     }
 

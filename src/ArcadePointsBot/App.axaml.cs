@@ -1,53 +1,56 @@
-using Avalonia;
-using Avalonia.Controls;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Data.Core.Plugins;
-using Avalonia.Markup.Xaml;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Threading.Tasks;
 using ArcadePointsBot.Auth;
 using ArcadePointsBot.Config;
 using ArcadePointsBot.Data.Abstractions.Repositories;
 using ArcadePointsBot.Data.Contexts;
 using ArcadePointsBot.Data.Repositories;
+using ArcadePointsBot.Domain.Rewards;
+using ArcadePointsBot.Infrastructure.Interop;
 using ArcadePointsBot.Services;
 using ArcadePointsBot.ViewModels;
 using ArcadePointsBot.Views;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Data.Core.Plugins;
+using Avalonia.Markup.Xaml;
+using Mediator;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
-using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using ArcadePointsBot.Domain.Rewards;
-using ArcadePointsBot.Infrastructure.Interop;
 
 namespace ArcadePointsBot;
-public partial class App : Application
+
+public partial class App : Avalonia.Application
 {
+    private static ILogger<App> _appLogger = null!;
+    private static IMediator _appMessenger = null!;
     public IHost? GlobalHost { get; private set; }
 
     private void EnsureDb(IServiceProvider services)
     {
         using var scope = services.CreateScope();
-        var loggerFactory = scope.ServiceProvider.GetRequiredService<ILoggerFactory>();
-        var logger = loggerFactory.CreateLogger("App");
-        logger.LogInformation("Checking for Db updates");
+        _appLogger.LogInformation("Checking for Db updates");
         try
         {
             using var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
             var migrations = db.Database.GetPendingMigrations();
             if (migrations.Any())
             {
-                logger.LogInformation("Found {count} updates, updating DB", migrations.Count());
+                _appLogger.LogInformation("Found {count} updates, updating DB", migrations.Count());
                 db.Database.Migrate();
             }
         }
         catch (Exception ex)
         {
-            logger.LogError(ex, "An Error occurred updating the DB");
+            _appLogger.LogError(ex, "An Error occurred updating the DB");
             throw;
         }
     }
@@ -60,12 +63,21 @@ public partial class App : Application
     public override async void OnFrameworkInitializationCompleted()
     {
         GlobalHost = CreateAppBuilder().Build();
+        var appScope = GlobalHost.Services.CreateScope();
+        var loggerFactory = appScope.ServiceProvider.GetRequiredService<ILoggerFactory>();
+        _appLogger = loggerFactory.CreateLogger<App>();
+        _appMessenger = appScope.ServiceProvider.GetRequiredService<IMediator>();
         EnsureDb(GlobalHost.Services);
 
-
-        var lang = GlobalHost.Services.GetRequiredService<IConfiguration>().GetValue<string>("lang");
-        ArcadePointsBot.Resources.L10n.Culture = new System.Globalization.CultureInfo(lang ?? "en-US");
-        ArcadePointsBot.Resources.Enums.Culture = new System.Globalization.CultureInfo(lang ?? "en-US");
+        var lang = GlobalHost
+            .Services.GetRequiredService<IConfiguration>()
+            .GetValue<string>("lang");
+        ArcadePointsBot.Resources.L10n.Culture = new System.Globalization.CultureInfo(
+            lang ?? "en-US"
+        );
+        ArcadePointsBot.Resources.Enums.Culture = new System.Globalization.CultureInfo(
+            lang ?? "en-US"
+        );
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
@@ -77,10 +89,12 @@ public partial class App : Application
             {
                 DataContext = GlobalHost.Services.GetRequiredService<MainWindowViewModel>(),
             };
+
+            desktop.ShutdownRequested += ShutDown;
             desktop.Exit += (_, _) =>
             {
-                GlobalHost.StopAsync().GetAwaiter().GetResult();
                 GlobalHost.Dispose();
+                appScope.Dispose();
                 GlobalHost = null;
             };
         }
@@ -92,20 +106,42 @@ public partial class App : Application
         await GlobalHost.StartAsync();
     }
 
-
-    public static IHostBuilder CreateAppBuilder() => Host
-    .CreateDefaultBuilder(Environment.GetCommandLineArgs())
-    .UseSerilog((ctx, svc, cfg) =>
+    private void ShutDown(object? sender, ShutdownRequestedEventArgs e)
     {
-        cfg
-        .ReadFrom.Configuration(ctx.Configuration)
-        .ReadFrom.Services(svc)
-        .Enrich.FromLogContext();
-    })
-    .ConfigureAppConfiguration(WithApplicationConfiguration)
-    .ConfigureServices(WithApplicationServices);
+        _appLogger.LogTrace("App shutdown requested by, {sender}", sender);
+        _appLogger.LogInformation("Stopping App");
 
-    private static void WithApplicationConfiguration(HostBuilderContext context, IConfigurationBuilder configurationBuilder)
+        _appLogger.LogTrace("Disabling rewards");
+
+        var task = Task.Factory.StartNew(
+            async () =>
+            {
+                var res = await _appMessenger.Send(new Application.Rewards.DisableRewardsCommand());
+                _appLogger.LogTrace("Rewards Disabled: {success}", res.IsSuccess);
+            },
+            TaskCreationOptions.LongRunning
+        );
+        Task.Delay(2000).Wait();
+        GlobalHost!.StopAsync();
+    }
+
+    public static IHostBuilder CreateAppBuilder() =>
+        Host.CreateDefaultBuilder(Environment.GetCommandLineArgs())
+            .UseSerilog(
+                (ctx, svc, cfg) =>
+                {
+                    cfg.ReadFrom.Configuration(ctx.Configuration)
+                        .ReadFrom.Services(svc)
+                        .Enrich.FromLogContext();
+                }
+            )
+            .ConfigureAppConfiguration(WithApplicationConfiguration)
+            .ConfigureServices(WithApplicationServices);
+
+    private static void WithApplicationConfiguration(
+        HostBuilderContext context,
+        IConfigurationBuilder configurationBuilder
+    )
     {
         if (Design.IsDesignMode)
             return;
@@ -128,13 +164,24 @@ public partial class App : Application
         {
             configurationBuilder.AddUserSecrets(Assembly.GetExecutingAssembly());
         }
-
     }
-    private static void WithApplicationServices(HostBuilderContext context, IServiceCollection services)
+
+    private static void WithApplicationServices(
+        HostBuilderContext context,
+        IServiceCollection services
+    )
     {
+        services.AddMediator(cfg =>
+        {
+            cfg.ServiceLifetime = ServiceLifetime.Scoped;
+        });
+
         services.AddDbContext<ApplicationDbContext>(options =>
         {
-            var dbPath = Path.Join(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ArcadePointsBot.db");
+            var dbPath = Path.Join(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "ArcadePointsBot.db"
+            );
             options.UseSqlite($"Data Source={dbPath}");
         });
 
@@ -145,7 +192,8 @@ public partial class App : Application
             var rawConfig = context.Configuration;
             options.PropertyChanged += (o, e) =>
             {
-                if (e is not PropertyChangedEventArgsEx args) throw new InvalidOperationException();
+                if (e is not PropertyChangedEventArgsEx args)
+                    throw new InvalidOperationException();
                 rawConfig["TwitchAuthConfig:" + args.PropertyName!] = args.Value?.ToString();
             };
         });
@@ -154,8 +202,8 @@ public partial class App : Application
         services.AddSingleton<IAuthenticationService, TwitchAuthenticationService>();
         services.AddScoped<TwitchPointRewardService>();
 
-        services.AddScoped(typeof(IEntityRepository<,>), typeof(DataEntityRepository<,>));
-        services.AddScoped<IRewardRepository, RewardRepository>();
+        services.AddTransient(typeof(IEntityRepository<,>), typeof(DataEntityRepository<,>));
+        services.AddTransient<IRewardRepository, RewardRepository>();
 
         services.AddSingleton<Mouse>();
         services.AddSingleton<Keyboard>();
