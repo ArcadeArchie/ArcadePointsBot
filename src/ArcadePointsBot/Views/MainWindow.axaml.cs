@@ -1,13 +1,13 @@
+using System.Globalization;
+using ArcadePointsBot.Domain.Rewards;
+using ArcadePointsBot.ViewModels;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using Avalonia.ReactiveUI;
 using Avalonia.Threading;
-using ArcadePointsBot.ViewModels;
-using ReactiveUI;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
-using System.Globalization;
-using ArcadePointsBot.Domain.Rewards;
+using Microsoft.Extensions.DependencyInjection;
+using ReactiveUI;
 
 namespace ArcadePointsBot.Views
 {
@@ -19,10 +19,10 @@ namespace ArcadePointsBot.Views
 
             this.WhenActivated(disposables =>
             {
-
                 Dispatcher.UIThread.Post(async () =>
                 {
-                    if (Design.IsDesignMode) return;
+                    if (Design.IsDesignMode)
+                        return;
                     await ViewModel!.Login();
                     await ViewModel!.LoadRewards();
                 });
@@ -37,14 +37,18 @@ namespace ArcadePointsBot.Views
                 ViewModel!.ChangeRewardEnabled(reward);
             }
         }
+
         void ChangeWorkerStatus(object sender, RoutedEventArgs e)
         {
             if (ViewModel!.WorkerStatus == ArcadePointsBot.WorkerStatus.Running)
                 ViewModel!.StopWorker();
-            if (ViewModel!.WorkerStatus == ArcadePointsBot.WorkerStatus.Stopped ||
-                ViewModel!.WorkerStatus == ArcadePointsBot.WorkerStatus.Errored )
+            if (
+                ViewModel!.WorkerStatus == ArcadePointsBot.WorkerStatus.Stopped
+                || ViewModel!.WorkerStatus == ArcadePointsBot.WorkerStatus.Errored
+            )
                 ViewModel!.StartWorker();
         }
+
         protected override void OnClosing(WindowClosingEventArgs e)
         {
             ViewModel?.StopWorker();

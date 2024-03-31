@@ -1,13 +1,21 @@
-﻿using Avalonia.Input;
-using System;
+﻿using System;
 using ArcadePointsBot.ViewModels;
+using Avalonia.Input;
 
 namespace ArcadePointsBot.Domain.Rewards;
 
 public class MouseRewardAction : RewardAction<MouseActionType, MouseButton>
 {
     public MouseRewardAction() { }
-    public MouseRewardAction(string id, int index, TwitchReward reward, int? duration, MouseActionType actionType, MouseButton actionKey)
+
+    public MouseRewardAction(
+        string id,
+        int index,
+        TwitchReward reward,
+        int? duration,
+        MouseActionType actionType,
+        MouseButton actionKey
+    )
     {
         Id = id;
         Index = index;
@@ -21,6 +29,13 @@ public class MouseRewardAction : RewardAction<MouseActionType, MouseButton>
     {
         var actionType = (MouseActionType)actionVM.ActionKeyType!;
         var key = (MouseButton)actionVM.ActionKey!;
-        return new(Guid.NewGuid().ToString(), actionVM.Index, reward, actionVM.Duration, actionType, key);
+        return new(
+            Guid.NewGuid().ToString(),
+            actionVM.Index,
+            reward,
+            actionVM.Duration,
+            actionType,
+            key
+        );
     }
 }

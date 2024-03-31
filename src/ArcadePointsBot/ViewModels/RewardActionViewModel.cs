@@ -1,27 +1,31 @@
-﻿using ReactiveUI;
-using ArcadePointsBot.Util;
+﻿using System;
 using System.Collections;
-using Avalonia.Input;
-using ReactiveUI.Fody.Helpers;
-using System;
 using ArcadePointsBot.Domain.Rewards;
+using ArcadePointsBot.Util;
+using Avalonia.Input;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace ArcadePointsBot.ViewModels;
 
 public class RewardActionViewModel : ReactiveObject
 {
     public string? Id { get; init; }
-    [Reactive] public int? Duration { get; set; }
-    [Reactive] public ActionType? ActionType { get; set; }
-    [Reactive] public Enum? ActionKeyType { get; set; }
-    [Reactive] public Enum? ActionKey { get; set; }
+
+    [Reactive]
+    public int? Duration { get; set; }
+
+    [Reactive]
+    public ActionType? ActionType { get; set; }
+
+    [Reactive]
+    public Enum? ActionKeyType { get; set; }
+
+    [Reactive]
+    public Enum? ActionKey { get; set; }
     public int Index { get; set; }
 
-
-    public RewardActionViewModel()
-    {
-
-    }
+    public RewardActionViewModel() { }
 
     public RewardActionViewModel(int index)
     {

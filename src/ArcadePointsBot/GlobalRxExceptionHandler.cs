@@ -1,10 +1,10 @@
-﻿using Avalonia.Controls.ApplicationLifetimes;
+﻿using System;
+using System.Diagnostics;
+using System.Reactive.Concurrency;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Microsoft.Extensions.Logging;
 using ReactiveUI;
-using System;
-using System.Diagnostics;
-using System.Reactive.Concurrency;
 
 namespace ArcadePointsBot
 {
@@ -19,25 +19,38 @@ namespace ArcadePointsBot
 
         public void OnCompleted()
         {
-            if (Debugger.IsAttached) Debugger.Break();
-            RxApp.MainThreadScheduler.Schedule(() => { throw new NotImplementedException(); });
+            if (Debugger.IsAttached)
+                Debugger.Break();
+            RxApp.MainThreadScheduler.Schedule(() =>
+            {
+                throw new NotImplementedException();
+            });
         }
 
         public void OnError(Exception error)
         {
-            if (Debugger.IsAttached) Debugger.Break();
+            if (Debugger.IsAttached)
+                Debugger.Break();
             _logger.LogCritical(error, "Something went wrong in the UI");
-            RxApp.MainThreadScheduler.Schedule(() => { throw error; });
+            RxApp.MainThreadScheduler.Schedule(() =>
+            {
+                throw error;
+            });
         }
 
         public void OnNext(Exception value)
         {
-            if (Debugger.IsAttached) Debugger.Break();
+            if (Debugger.IsAttached)
+                Debugger.Break();
             _logger.LogCritical(value, "Something went wrong in the UI");
-            if (App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime)
+            if (
+                App.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime lifetime
+            )
                 Dispatcher.UIThread.Post(() => lifetime.Shutdown(value.HResult));
-            RxApp.MainThreadScheduler.Schedule(() => { throw value; });
-
+            RxApp.MainThreadScheduler.Schedule(() =>
+            {
+                throw value;
+            });
         }
     }
 }

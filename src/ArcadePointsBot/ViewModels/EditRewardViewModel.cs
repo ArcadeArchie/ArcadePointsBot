@@ -1,4 +1,11 @@
-﻿using ArcadePointsBot.Domain.Rewards;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using ArcadePointsBot.Domain.Rewards;
 using ArcadePointsBot.Services;
 using ArcadePointsBot.Util;
 using DynamicData;
@@ -6,13 +13,6 @@ using DynamicData.Binding;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 
 namespace ArcadePointsBot.ViewModels;
 
@@ -20,8 +20,10 @@ public partial class EditRewardViewModel : ViewModelBase
 {
     private readonly TwitchPointRewardService _pointRewardService;
     private readonly TwitchReward _oldReward;
+
     [Reactive]
     public string Title { get; set; }
+
     [Reactive]
     public string? Category { get; set; }
 
@@ -51,20 +53,40 @@ public partial class EditRewardViewModel : ViewModelBase
         Cost = _oldReward.Cost;
         RequireInput = _oldReward.RequireInput;
 
-        Actions = new(new List<RewardActionViewModel>()
+        Actions = new(
+            new List<RewardActionViewModel>()
                 .Concat(reward.KeyboardActions.Select(RewardActionViewModel.FromAction))
-                .Concat(reward.MouseActions.Select(RewardActionViewModel.FromAction)).OrderBy(x => x.Index).ToList());
-        Actions.ToObservableChangeSet(x => x).ToCollection().Select(x => x.Any()).ToPropertyEx(this, x => x.HasActions);
+                .Concat(reward.MouseActions.Select(RewardActionViewModel.FromAction))
+                .OrderBy(x => x.Index)
+                .ToList()
+        );
+        Actions
+            .ToObservableChangeSet(x => x)
+            .ToCollection()
+            .Select(x => x.Any())
+            .ToPropertyEx(this, x => x.HasActions);
 
-        EditTwitchRewardCommand = ReactiveCommand.CreateFromTask(EditTwitchReward,
+        EditTwitchRewardCommand = ReactiveCommand.CreateFromTask(
+            EditTwitchReward,
             Observable.CombineLatest(
                 IsBusyObservable,
-                this.WhenAnyValue(x => x.Title, x => x.Cost, x => x.HasActions, (title, cost, hasActions) =>
-                !string.IsNullOrEmpty(title) && cost >= 10 && hasActions),
-                (isBusy, a) => isBusy && a));
-        AddActionCommand = ReactiveCommand.Create(() => Actions.Add(new RewardActionViewModel(Actions.Count)));
+                this.WhenAnyValue(
+                    x => x.Title,
+                    x => x.Cost,
+                    x => x.HasActions,
+                    (title, cost, hasActions) =>
+                        !string.IsNullOrEmpty(title) && cost >= 10 && hasActions
+                ),
+                (isBusy, a) => isBusy && a
+            )
+        );
+        AddActionCommand = ReactiveCommand.Create(
+            () => Actions.Add(new RewardActionViewModel(Actions.Count))
+        );
         DupeActionCommand = ReactiveCommand.Create<RewardActionViewModel>(DuplicateAction);
-        RemoveActionCommand = ReactiveCommand.Create<RewardActionViewModel>(action => Actions.Remove(action));
+        RemoveActionCommand = ReactiveCommand.Create<RewardActionViewModel>(action =>
+            Actions.Remove(action)
+        );
     }
 
     void DuplicateAction(RewardActionViewModel action)

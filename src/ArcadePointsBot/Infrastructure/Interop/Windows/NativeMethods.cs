@@ -1,11 +1,11 @@
 ﻿//https://gist.github.com/DrustZ/640912b9d5cb745a3a56971c9bd58ac7
-using Avalonia.Input;
-using Avalonia.Win32.Input;
 using System;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
+using Avalonia.Input;
+using Avalonia.Win32.Input;
 
 namespace ArcadePointsBot.Interop.Windows;
 
@@ -50,6 +50,7 @@ internal static class NativeMethods
     {
         [FieldOffset(0)]
         internal MOUSEINPUT mouseInput;
+
         [FieldOffset(0)]
         internal KEYBDINPUT keyboardInput;
     };
@@ -106,6 +107,7 @@ internal static class NativeMethods
 
     #endregion
 }
+
 [SupportedOSPlatform("windows")]
 public static class Keyboard
 {
@@ -153,7 +155,8 @@ public static class Keyboard
         NativeMethods.INPUT ki = new NativeMethods.INPUT();
         ki.type = NativeMethods.InputKeyboard;
         ki.union.keyboardInput.wVk = (short)KeyInterop.VirtualKeyFromKey(key);
-        ki.union.keyboardInput.wScan = (short)NativeMethods.MapVirtualKey(ki.union.keyboardInput.wVk, 0);
+        ki.union.keyboardInput.wScan = (short)
+            NativeMethods.MapVirtualKey(ki.union.keyboardInput.wVk, 0);
 
         int dwFlags = 0;
 
@@ -189,34 +192,35 @@ public static class Keyboard
     // CTRL keys on the right-hand side of the keyboard; the INS, DEL, HOME, END, PAGE UP,
     // PAGE DOWN, and arrow keys in the clusters to the left of the numeric keypad; the NUM LOCK
     // key; the BREAK (CTRL+PAUSE) key; the PRINT SCRN key; and the divide (/) and ENTER keys in
-    // the numeric keypad. The extended-key flag is set if the key is an extended key. 
+    // the numeric keypad. The extended-key flag is set if the key is an extended key.
     //
     // - docs appear to be incorrect. Use of Spy++ indicates that break is not an extended key.
     // Also, menu key and windows keys also appear to be extended.
-    private static readonly Key[] ExtendedKeys = new Key[] {
-                                                                   Key.RightAlt,
-                                                                   Key.RightCtrl,
-                                                                   Key.NumLock,
-                                                                   Key.Insert,
-                                                                   Key.Delete,
-                                                                   Key.Home,
-                                                                   Key.End,
-                                                                   Key.Prior,
-                                                                   Key.Next,
-                                                                   Key.Up,
-                                                                   Key.Down,
-                                                                   Key.Left,
-                                                                   Key.Right,
-                                                                   Key.Apps,
-                                                                   Key.RWin,
-                                                                   Key.LWin };
+    private static readonly Key[] ExtendedKeys = new Key[]
+    {
+        Key.RightAlt,
+        Key.RightCtrl,
+        Key.NumLock,
+        Key.Insert,
+        Key.Delete,
+        Key.Home,
+        Key.End,
+        Key.Prior,
+        Key.Next,
+        Key.Up,
+        Key.Down,
+        Key.Left,
+        Key.Right,
+        Key.Apps,
+        Key.RWin,
+        Key.LWin
+    };
     // Note that there are no distinct values for the following keys:
     // numpad divide
     // numpad enter
 
     #endregion
 }
-
 
 [SupportedOSPlatform("windows")]
 public static class Mouse
@@ -226,11 +230,13 @@ public static class Mouse
         Down(mouseButton);
         Up(mouseButton);
     }
+
     public static void DoubleClick(MouseButton mouseButton)
     {
         Click(mouseButton);
         Click(mouseButton);
     }
+
     public static void Down(MouseButton mouseButton)
     {
         switch (mouseButton)
@@ -245,15 +251,22 @@ public static class Mouse
                 SendMouseButtonInput(NativeMethods.SendMouseInputFlags.MiddleDown);
                 break;
             case MouseButton.XButton1:
-                SendMouseButtonInput(NativeMethods.SendMouseInputFlags.XDown, NativeMethods.XButton1);
+                SendMouseButtonInput(
+                    NativeMethods.SendMouseInputFlags.XDown,
+                    NativeMethods.XButton1
+                );
                 break;
             case MouseButton.XButton2:
-                SendMouseButtonInput(NativeMethods.SendMouseInputFlags.XDown, NativeMethods.XButton2);
+                SendMouseButtonInput(
+                    NativeMethods.SendMouseInputFlags.XDown,
+                    NativeMethods.XButton2
+                );
                 break;
             default:
                 throw new InvalidOperationException("Unsupported MouseButton input.");
         }
     }
+
     public static void Up(MouseButton mouseButton)
     {
         switch (mouseButton)
@@ -287,7 +300,11 @@ public static class Mouse
             throw new Win32Exception(Marshal.GetLastWin32Error());
         }
     }
-    private static NativeMethods.INPUT CreateMouseInput(NativeMethods.SendMouseInputFlags flags, int data = 0)
+
+    private static NativeMethods.INPUT CreateMouseInput(
+        NativeMethods.SendMouseInputFlags flags,
+        int data = 0
+    )
     {
         int intflags = (int)flags;
 
@@ -295,10 +312,7 @@ public static class Mouse
         {
             intflags |= NativeMethods.MouseeventfVirtualdesk;
         }
-        NativeMethods.INPUT mi = new()
-        {
-            type = NativeMethods.InputMouse
-        };
+        NativeMethods.INPUT mi = new() { type = NativeMethods.InputMouse };
         mi.union.mouseInput.dx = 0;
         mi.union.mouseInput.dy = 0;
         mi.union.mouseInput.mouseData = data;

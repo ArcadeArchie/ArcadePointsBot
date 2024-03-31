@@ -1,15 +1,16 @@
-﻿using ArcadePointsBot.Domain;
-using Microsoft.EntityFrameworkCore.Query;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using ArcadePointsBot.Domain;
+using Microsoft.EntityFrameworkCore.Query;
 
 namespace ArcadePointsBot.Data.Abstractions.Repositories;
 
-public interface IEntityRepository<T, TId> : IReadRepository<T>, IWriteRepository<T, TId> where T : IEntity<TId>
+public interface IEntityRepository<T, TId> : IReadRepository<T>, IWriteRepository<T, TId>
+    where T : IEntity<TId>
 {
     /// <summary>
     /// Finds an entity from data store.
@@ -26,12 +27,14 @@ public interface IEntityRepository<T, TId> : IReadRepository<T>, IWriteRepositor
     Task<T?> FindAsync(TId id);
 }
 
-public interface IRepository<T, TId> where T : IEntity<TId>
+public interface IRepository<T, TId>
+    where T : IEntity<TId>
 {
     IUnitOfWork UnitOfWork { get; }
 }
 
-public interface IWriteRepository<T, TId> : IRepository<T, TId> where T : IEntity<TId>
+public interface IWriteRepository<T, TId> : IRepository<T, TId>
+    where T : IEntity<TId>
 {
     /// <summary>
     /// Adds the entity to the data store
@@ -82,7 +85,10 @@ public interface IWriteRepository<T, TId> : IRepository<T, TId> where T : IEntit
     /// <param name="entities">The collection of entities to update</param>
     void UpdateRange(IEnumerable<T> entities);
 
-    public Task<int> ExecuteUpdate(IEnumerable<T> entities, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setPropertyCalls);
+    public Task<int> ExecuteUpdate(
+        IEnumerable<T> entities,
+        Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setPropertyCalls
+    );
 }
 
 /// <summary>
@@ -112,7 +118,7 @@ public interface IReadRepository<T>
     IQueryable<T> GetAll();
 
     /// <summary>
-    /// Retrieves all entities that satisfy the given condition from the data store as <see cref="IQueryable{T}"/> 
+    /// Retrieves all entities that satisfy the given condition from the data store as <see cref="IQueryable{T}"/>
     /// </summary>
     /// <param name="predicate">Condition</param>
     /// <returns>Query</returns>

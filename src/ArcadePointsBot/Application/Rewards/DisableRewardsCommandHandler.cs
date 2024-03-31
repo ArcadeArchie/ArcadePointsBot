@@ -41,7 +41,8 @@ public class DisableRewardsCommandHandler : ICommandHandler<DisableRewardsComman
                 {
                     x.IsEnabled = false;
                     return x;
-                }).ToList();
+                })
+                .ToList();
             await _rewardService.BulkUpdateRewards(
                 toDisable,
                 u => u.SetProperty(p => p.IsEnabled, false)

@@ -1,7 +1,7 @@
-using Avalonia.ReactiveUI;
-using ArcadePointsBot.ViewModels;
-using ReactiveUI;
 using System;
+using ArcadePointsBot.ViewModels;
+using Avalonia.ReactiveUI;
+using ReactiveUI;
 
 namespace ArcadePointsBot;
 
@@ -11,10 +11,14 @@ public partial class CreateRewardWindow : ReactiveWindow<CreateRewardWindowViewM
     {
         InitializeComponent();
 
-        this.WhenActivated(d => d(ViewModel!.CreateTwitchRewardCommand.Subscribe(x =>
-        {
-            if (x != null)
-                Close(x);
-        })));
+        this.WhenActivated(d =>
+            d(
+                ViewModel!.CreateTwitchRewardCommand.Subscribe(x =>
+                {
+                    if (x != null)
+                        Close(x);
+                })
+            )
+        );
     }
 }

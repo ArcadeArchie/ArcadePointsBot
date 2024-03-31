@@ -1,18 +1,19 @@
-﻿using IdentityModel.OidcClient.Browser;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using System;
+﻿using System;
 using System.Diagnostics;
-using System.Net.Sockets;
+using System.IO;
 using System.Net;
+using System.Net.Sockets;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.IO;
+using IdentityModel.OidcClient.Browser;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 
 namespace ArcadePointsBot;
+
 public class SystemBrowser : IBrowser
 {
     public int Port { get; }
@@ -41,7 +42,10 @@ public class SystemBrowser : IBrowser
         return port;
     }
 
-    public async Task<BrowserResult> InvokeAsync(BrowserOptions options, CancellationToken cancellationToken = default(CancellationToken))
+    public async Task<BrowserResult> InvokeAsync(
+        BrowserOptions options,
+        CancellationToken cancellationToken = default(CancellationToken)
+    )
     {
         using (var listener = new LoopbackHttpListener(Port, _path))
         {
@@ -52,18 +56,34 @@ public class SystemBrowser : IBrowser
                 var result = await listener.WaitForCallbackAsync();
                 if (string.IsNullOrWhiteSpace(result))
                 {
-                    return new BrowserResult { ResultType = BrowserResultType.UnknownError, Error = "Empty response." };
+                    return new BrowserResult
+                    {
+                        ResultType = BrowserResultType.UnknownError,
+                        Error = "Empty response."
+                    };
                 }
 
-                return new BrowserResult { Response = result, ResultType = BrowserResultType.Success };
+                return new BrowserResult
+                {
+                    Response = result,
+                    ResultType = BrowserResultType.Success
+                };
             }
             catch (TaskCanceledException ex)
             {
-                return new BrowserResult { ResultType = BrowserResultType.Timeout, Error = ex.Message };
+                return new BrowserResult
+                {
+                    ResultType = BrowserResultType.Timeout,
+                    Error = ex.Message
+                };
             }
             catch (Exception ex)
             {
-                return new BrowserResult { ResultType = BrowserResultType.UnknownError, Error = ex.Message };
+                return new BrowserResult
+                {
+                    ResultType = BrowserResultType.UnknownError,
+                    Error = ex.Message
+                };
             }
         }
     }
@@ -80,7 +100,9 @@ public class SystemBrowser : IBrowser
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 url = url.Replace("&", "^&");
-                Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+                Process.Start(
+                    new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true }
+                );
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
@@ -111,15 +133,12 @@ public class LoopbackHttpListener : IDisposable
     public LoopbackHttpListener(int port, string? path = null)
     {
         path ??= string.Empty;
-        if (path.StartsWith("/")) path = path[1..];
+        if (path.StartsWith("/"))
+            path = path[1..];
 
         _url = $"http://127.0.0.1:{port}/{path}";
 
-        _host = new WebHostBuilder()
-            .UseKestrel()
-            .UseUrls(_url)
-            .Configure(Configure)
-            .Build();
+        _host = new WebHostBuilder().UseKestrel().UseUrls(_url).Configure(Configure).Build();
         _host.Start();
     }
 
@@ -142,7 +161,12 @@ public class LoopbackHttpListener : IDisposable
             }
             else if (ctx.Request.Method == "POST")
             {
-                if (!ctx.Request.ContentType!.Equals("application/x-www-form-urlencoded", StringComparison.OrdinalIgnoreCase))
+                if (
+                    !ctx.Request.ContentType!.Equals(
+                        "application/x-www-form-urlencoded",
+                        StringComparison.OrdinalIgnoreCase
+                    )
+                )
                 {
                     ctx.Response.StatusCode = 415;
                 }

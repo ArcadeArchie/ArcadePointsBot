@@ -1,42 +1,50 @@
-﻿using IdentityModel.OidcClient;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Threading.Tasks;
+using IdentityModel.OidcClient;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace ArcadePointsBot.Auth
 {
     internal class TwitchAuthenticationService : IAuthenticationService
     {
-        private const string SCOPES = "openid channel:read:redemptions user:read:chat user:bot channel:moderate channel:manage:redemptions";
+        private const string SCOPES =
+            "openid channel:read:redemptions user:read:chat user:bot channel:moderate channel:manage:redemptions";
         private readonly ILogger<TwitchAuthenticationService> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly OidcClient _oidcClient;
         public TwitchAuthConfig AuthConfig { get; }
 
-        public TwitchAuthenticationService(IOptions<TwitchAuthConfig> config, ILoggerFactory loggerFactory)
+        public TwitchAuthenticationService(
+            IOptions<TwitchAuthConfig> config,
+            ILoggerFactory loggerFactory
+        )
         {
             AuthConfig = config.Value;
             _loggerFactory = loggerFactory;
             _logger = loggerFactory.CreateLogger<TwitchAuthenticationService>();
-            _oidcClient = new OidcClient(new OidcClientOptions
-            {
-                Authority = "https://id.twitch.tv/oauth2",
-                ClientId = AuthConfig.ClientId,
-                ClientSecret = AuthConfig.ClientSecret,
-                RedirectUri = "http://localhost:5000",
-                LoggerFactory = _loggerFactory,
-                Scope = SCOPES,
-                FilterClaims = false,
-                Browser = new SystemBrowser(5000),
-            });
+            _oidcClient = new OidcClient(
+                new OidcClientOptions
+                {
+                    Authority = "https://id.twitch.tv/oauth2",
+                    ClientId = AuthConfig.ClientId,
+                    ClientSecret = AuthConfig.ClientSecret,
+                    RedirectUri = "http://localhost:5000",
+                    LoggerFactory = _loggerFactory,
+                    Scope = SCOPES,
+                    FilterClaims = false,
+                    Browser = new SystemBrowser(5000),
+                }
+            );
         }
 
         public async Task<bool> RequestCredentials()
         {
-            if (string.IsNullOrEmpty(AuthConfig.AccessToken) ||
-                AuthConfig.AccessTokenExpiration < DateTimeOffset.UtcNow)
+            if (
+                string.IsNullOrEmpty(AuthConfig.AccessToken)
+                || AuthConfig.AccessTokenExpiration < DateTimeOffset.UtcNow
+            )
             {
                 _logger.LogInformation("Requesting Twitch credentials");
 
@@ -63,19 +71,25 @@ namespace ArcadePointsBot.Auth
 
         public async Task<bool> IsTokenValidAsync()
         {
-            if (string.IsNullOrEmpty(AuthConfig.AccessToken) ||
-                AuthConfig.AccessTokenExpiration < DateTimeOffset.UtcNow)
+            if (
+                string.IsNullOrEmpty(AuthConfig.AccessToken)
+                || AuthConfig.AccessTokenExpiration < DateTimeOffset.UtcNow
+            )
                 return false;
             using var http = new HttpClient();
-            http.DefaultRequestHeaders.Authorization = 
-                new System.Net.Http.Headers.AuthenticationHeaderValue("OAuth", AuthConfig.AccessToken);
+            http.DefaultRequestHeaders.Authorization =
+                new System.Net.Http.Headers.AuthenticationHeaderValue(
+                    "OAuth",
+                    AuthConfig.AccessToken
+                );
             var res = await http.GetAsync("https://id.twitch.tv/oauth2/validate");
             return res.IsSuccessStatusCode;
         }
 
         public async Task EnsureValidTokenAsync()
         {
-            if (await IsTokenValidAsync()) return;
+            if (await IsTokenValidAsync())
+                return;
 
             if (!string.IsNullOrEmpty(AuthConfig.RefreshToken))
                 await RefreshCredentials();

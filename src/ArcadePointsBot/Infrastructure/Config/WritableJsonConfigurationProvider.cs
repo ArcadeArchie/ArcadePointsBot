@@ -1,6 +1,4 @@
-﻿using ArcadePointsBot.Auth;
-using Microsoft.Extensions.Configuration.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,28 +6,34 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using ArcadePointsBot.Auth;
+using Microsoft.Extensions.Configuration.Json;
 
 namespace ArcadePointsBot.Config
 {
     internal class WritableJsonConfigurationProvider : JsonConfigurationProvider
     {
-        public WritableJsonConfigurationProvider(JsonConfigurationSource source) : base(source) { }
+        public WritableJsonConfigurationProvider(JsonConfigurationSource source)
+            : base(source) { }
 
         public override void Set(string key, string? value)
         {
             base.Set(key, value);
-            if (Source.FileProvider == null) throw new InvalidOperationException("The FileProvider cannot be null");
-            if (string.IsNullOrEmpty(Source.Path)) throw new InvalidOperationException("The Sourcepath cannot be null");
+            if (Source.FileProvider == null)
+                throw new InvalidOperationException("The FileProvider cannot be null");
+            if (string.IsNullOrEmpty(Source.Path))
+                throw new InvalidOperationException("The Sourcepath cannot be null");
             var fullPath = Source.FileProvider.GetFileInfo(Source.Path).PhysicalPath;
             var json = File.ReadAllText(fullPath!);
 
             var config = JsonNode.Parse(json);
-            if (config is null) throw new JsonException("Malformed app config");
+            if (config is null)
+                throw new JsonException("Malformed app config");
             var configObj = config.AsObject();
             var keyParts = key.Split(':');
             if (keyParts.Length > 1)
             {
-                if(configObj[keyParts[0]] is null)
+                if (configObj[keyParts[0]] is null)
                     configObj[keyParts[0]] = new JsonObject();
                 configObj[keyParts[0]]![keyParts[1]] = value;
             }
@@ -37,10 +41,10 @@ namespace ArcadePointsBot.Config
             {
                 configObj[key] = value;
             }
-            File.WriteAllText(fullPath!, configObj.ToJsonString(new JsonSerializerOptions
-            {
-                WriteIndented = true
-            }));
+            File.WriteAllText(
+                fullPath!,
+                configObj.ToJsonString(new JsonSerializerOptions { WriteIndented = true })
+            );
         }
     }
 
