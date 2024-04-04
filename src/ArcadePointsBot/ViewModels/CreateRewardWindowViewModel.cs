@@ -1,4 +1,10 @@
-﻿using ArcadePointsBot.Domain.Rewards;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive;
+using System.Reactive.Linq;
+using System.Threading.Tasks;
+using ArcadePointsBot.Domain.Rewards;
 using ArcadePointsBot.Services;
 using ArcadePointsBot.Util;
 using DynamicData;
@@ -6,12 +12,6 @@ using DynamicData.Binding;
 using Microsoft.Extensions.DependencyInjection;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reactive;
-using System.Reactive.Linq;
-using System.Threading.Tasks;
 
 namespace ArcadePointsBot.ViewModels
 {
@@ -22,6 +22,7 @@ namespace ArcadePointsBot.ViewModels
 
         [Reactive]
         public string? Title { get; set; }
+
         [Reactive]
         public string? Category { get; set; }
 
@@ -45,18 +46,34 @@ namespace ArcadePointsBot.ViewModels
         public CreateRewardWindowViewModel(IServiceProvider serviceProvider)
         {
             _serviceScope = serviceProvider.CreateScope();
-            _pointRewardService = _serviceScope.ServiceProvider.GetRequiredService<TwitchPointRewardService>();
-            Actions.ToObservableChangeSet(x => x).ToCollection().Select(x => x.Any()).ToPropertyEx(this, x => x.HasActions);
-            CreateTwitchRewardCommand = ReactiveCommand.CreateFromTask(CreateTwitchReward,
+            _pointRewardService =
+                _serviceScope.ServiceProvider.GetRequiredService<TwitchPointRewardService>();
+            Actions
+                .ToObservableChangeSet(x => x)
+                .ToCollection()
+                .Select(x => x.Any())
+                .ToPropertyEx(this, x => x.HasActions);
+            CreateTwitchRewardCommand = ReactiveCommand.CreateFromTask(
+                CreateTwitchReward,
                 Observable.CombineLatest(
                     IsBusyObservable,
-                    this.WhenAnyValue(x => x.Title, x => x.Cost, x => x.HasActions, (title, cost, hasActions) =>
-                    !string.IsNullOrEmpty(title) && cost >= 10 && hasActions),
-                    (isBusy, a) =>
-                    isBusy && a));
-            AddActionCommand = ReactiveCommand.Create(() => Actions.Add(new RewardActionViewModel(Actions.Count)));
+                    this.WhenAnyValue(
+                        x => x.Title,
+                        x => x.Cost,
+                        x => x.HasActions,
+                        (title, cost, hasActions) =>
+                            !string.IsNullOrEmpty(title) && cost >= 10 && hasActions
+                    ),
+                    (isBusy, a) => isBusy && a
+                )
+            );
+            AddActionCommand = ReactiveCommand.Create(
+                () => Actions.Add(new RewardActionViewModel(Actions.Count))
+            );
             DupeActionCommand = ReactiveCommand.Create<RewardActionViewModel>(DuplicateAction);
-            RemoveActionCommand = ReactiveCommand.Create<RewardActionViewModel>(action => Actions.Remove(action));
+            RemoveActionCommand = ReactiveCommand.Create<RewardActionViewModel>(action =>
+                Actions.Remove(action)
+            );
         }
 
         void DuplicateAction(RewardActionViewModel action)
@@ -74,9 +91,14 @@ namespace ArcadePointsBot.ViewModels
         async Task<TwitchReward?> CreateTwitchReward()
         {
             Errors.Clear();
-            var result = await _pointRewardService
-                .CreateReward(Title!, Category, Cost, RequireInput, Actions);
-            if(result.IsSuccess)
+            var result = await _pointRewardService.CreateReward(
+                Title!,
+                Category,
+                Cost,
+                RequireInput,
+                Actions
+            );
+            if (result.IsSuccess)
                 return result.Value;
             Errors.Add(result.Error);
             return null;

@@ -15,15 +15,14 @@ namespace ArcadePointsBot.Data.Migrations
                 table: "Rewards",
                 type: "tinyint(1)",
                 nullable: false,
-                defaultValue: false);
+                defaultValue: false
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "IsEnabled",
-                table: "Rewards");
+            migrationBuilder.DropColumn(name: "IsEnabled", table: "Rewards");
         }
     }
 }

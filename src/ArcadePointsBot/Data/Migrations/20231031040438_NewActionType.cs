@@ -16,7 +16,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "TEXT",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "longtext");
+                oldType: "longtext"
+            );
 
             migrationBuilder.AlterColumn<bool>(
                 name: "RequireInput",
@@ -24,7 +25,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "INTEGER",
                 nullable: false,
                 oldClrType: typeof(bool),
-                oldType: "tinyint(1)");
+                oldType: "tinyint(1)"
+            );
 
             migrationBuilder.AlterColumn<bool>(
                 name: "IsEnabled",
@@ -32,7 +34,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "INTEGER",
                 nullable: false,
                 oldClrType: typeof(bool),
-                oldType: "tinyint(1)");
+                oldType: "tinyint(1)"
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "Cost",
@@ -40,7 +43,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "INTEGER",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "int");
+                oldType: "int"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Id",
@@ -48,7 +52,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "TEXT",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "varchar(255)");
+                oldType: "varchar(255)"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "RewardId",
@@ -56,7 +61,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "TEXT",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "varchar(255)");
+                oldType: "varchar(255)"
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "Index",
@@ -64,7 +70,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "INTEGER",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "int");
+                oldType: "int"
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "Duration",
@@ -73,7 +80,8 @@ namespace ArcadePointsBot.Data.Migrations
                 nullable: true,
                 oldClrType: typeof(int),
                 oldType: "int",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "ActionType",
@@ -81,7 +89,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "INTEGER",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "int");
+                oldType: "int"
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "ActionKey",
@@ -89,7 +98,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "INTEGER",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "int");
+                oldType: "int"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Id",
@@ -97,7 +107,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "TEXT",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "varchar(255)");
+                oldType: "varchar(255)"
+            );
 
             migrationBuilder.CreateTable(
                 name: "MouseRewardAction",
@@ -118,20 +129,22 @@ namespace ArcadePointsBot.Data.Migrations
                         column: x => x.RewardId,
                         principalTable: "Rewards",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
+                        onDelete: ReferentialAction.Cascade
+                    );
+                }
+            );
 
             migrationBuilder.CreateIndex(
                 name: "IX_MouseRewardAction_RewardId",
                 table: "MouseRewardAction",
-                column: "RewardId");
+                column: "RewardId"
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropTable(
-                name: "MouseRewardAction");
+            migrationBuilder.DropTable(name: "MouseRewardAction");
 
             migrationBuilder.AlterColumn<string>(
                 name: "Title",
@@ -139,7 +152,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "longtext",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "TEXT");
+                oldType: "TEXT"
+            );
 
             migrationBuilder.AlterColumn<bool>(
                 name: "RequireInput",
@@ -147,7 +161,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "tinyint(1)",
                 nullable: false,
                 oldClrType: typeof(bool),
-                oldType: "INTEGER");
+                oldType: "INTEGER"
+            );
 
             migrationBuilder.AlterColumn<bool>(
                 name: "IsEnabled",
@@ -155,7 +170,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "tinyint(1)",
                 nullable: false,
                 oldClrType: typeof(bool),
-                oldType: "INTEGER");
+                oldType: "INTEGER"
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "Cost",
@@ -163,7 +179,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "int",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "INTEGER");
+                oldType: "INTEGER"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Id",
@@ -171,7 +188,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "varchar(255)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "TEXT");
+                oldType: "TEXT"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "RewardId",
@@ -179,7 +197,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "varchar(255)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "TEXT");
+                oldType: "TEXT"
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "Index",
@@ -187,7 +206,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "int",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "INTEGER");
+                oldType: "INTEGER"
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "Duration",
@@ -196,7 +216,8 @@ namespace ArcadePointsBot.Data.Migrations
                 nullable: true,
                 oldClrType: typeof(int),
                 oldType: "INTEGER",
-                oldNullable: true);
+                oldNullable: true
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "ActionType",
@@ -204,7 +225,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "int",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "INTEGER");
+                oldType: "INTEGER"
+            );
 
             migrationBuilder.AlterColumn<int>(
                 name: "ActionKey",
@@ -212,7 +234,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "int",
                 nullable: false,
                 oldClrType: typeof(int),
-                oldType: "INTEGER");
+                oldType: "INTEGER"
+            );
 
             migrationBuilder.AlterColumn<string>(
                 name: "Id",
@@ -220,7 +243,8 @@ namespace ArcadePointsBot.Data.Migrations
                 type: "varchar(255)",
                 nullable: false,
                 oldClrType: typeof(string),
-                oldType: "TEXT");
+                oldType: "TEXT"
+            );
         }
     }
 }

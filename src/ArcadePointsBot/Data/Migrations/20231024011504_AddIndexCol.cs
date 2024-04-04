@@ -15,15 +15,14 @@ namespace ArcadePointsBot.Data.Migrations
                 table: "Actions",
                 type: "int",
                 nullable: false,
-                defaultValue: 0);
+                defaultValue: 0
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Index",
-                table: "Actions");
+            migrationBuilder.DropColumn(name: "Index", table: "Actions");
         }
     }
 }

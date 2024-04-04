@@ -15,24 +15,27 @@ namespace ArcadePointsBot.Domain.Rewards
         private bool _isEnabled;
         public bool IsEnabled
         {
-            get => _isEnabled; set
+            get => _isEnabled;
+            set
             {
                 _isEnabled = value;
                 PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsEnabled)));
             }
         }
 
-        public IList<KeyboardRewardAction> KeyboardActions { get; init; } = new List<KeyboardRewardAction>();
+        public IList<KeyboardRewardAction> KeyboardActions { get; init; } =
+            new List<KeyboardRewardAction>();
         public IList<MouseRewardAction> MouseActions { get; init; } = new List<MouseRewardAction>();
 
         public event PropertyChangedEventHandler? PropertyChanged;
 
-        public static TwitchReward FromRemote(CustomReward remoteReward) => new TwitchReward
-        {
-            Id = remoteReward.Id,
-            Title = remoteReward.Title,
-            Cost = remoteReward.Cost,
-            RequireInput = remoteReward.IsUserInputRequired
-        };
+        public static TwitchReward FromRemote(CustomReward remoteReward) =>
+            new TwitchReward
+            {
+                Id = remoteReward.Id,
+                Title = remoteReward.Title,
+                Cost = remoteReward.Cost,
+                RequireInput = remoteReward.IsUserInputRequired
+            };
     }
 }

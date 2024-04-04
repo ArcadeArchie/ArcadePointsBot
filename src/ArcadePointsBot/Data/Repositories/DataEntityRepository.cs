@@ -1,20 +1,21 @@
-﻿using ArcadePointsBot.Data.Abstractions;
-using ArcadePointsBot.Data.Abstractions.Repositories;
-using ArcadePointsBot.Data.Contexts;
-using ArcadePointsBot.Domain;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
+using ArcadePointsBot.Data.Abstractions;
+using ArcadePointsBot.Data.Abstractions.Repositories;
+using ArcadePointsBot.Data.Contexts;
+using ArcadePointsBot.Domain;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using TwitchLib.Api.Helix.Models.Soundtrack;
 
 namespace ArcadePointsBot.Data.Repositories
 {
-    internal class DataEntityRepository<T, TId> : IEntityRepository<T, TId> where T : class, IEntity<TId>
+    internal class DataEntityRepository<T, TId> : IEntityRepository<T, TId>
+        where T : class, IEntity<TId>
     {
         protected readonly DbSet<T> _entities;
         protected readonly ApplicationDbContext _context;
@@ -112,8 +113,10 @@ namespace ArcadePointsBot.Data.Repositories
             }
         }
 
-        public Task<int> ExecuteUpdate(IEnumerable<T> entities, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setPropertyCalls)
-            => _entities.Where(x => entities.Contains(x)).ExecuteUpdateAsync(setPropertyCalls);
+        public Task<int> ExecuteUpdate(
+            IEnumerable<T> entities,
+            Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> setPropertyCalls
+        ) => _entities.Where(x => entities.Contains(x)).ExecuteUpdateAsync(setPropertyCalls);
 
         public T? Find(TId id)
         {

@@ -14,15 +14,14 @@ namespace ArcadePointsBot.Data.Migrations
                 name: "Category",
                 table: "Rewards",
                 type: "TEXT",
-                nullable: true);
+                nullable: true
+            );
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DropColumn(
-                name: "Category",
-                table: "Rewards");
+            migrationBuilder.DropColumn(name: "Category", table: "Rewards");
         }
     }
 }

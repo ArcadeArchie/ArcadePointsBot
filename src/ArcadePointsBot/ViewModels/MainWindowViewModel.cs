@@ -1,23 +1,23 @@
-﻿using Avalonia.Collections;
-using Avalonia.Controls.ApplicationLifetimes;
-using Avalonia.Threading;
-using ArcadePointsBot.Auth;
-using ArcadePointsBot.Services;
-using ArcadePointsBot.Views;
-using DynamicData;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using ReactiveUI;
-using ReactiveUI.Fody.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reactive;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
+using ArcadePointsBot.Auth;
 using ArcadePointsBot.Domain.Rewards;
+using ArcadePointsBot.Services;
+using ArcadePointsBot.Views;
+using Avalonia.Collections;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Threading;
+using DynamicData;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using ReactiveUI;
+using ReactiveUI.Fody.Helpers;
 
 namespace ArcadePointsBot.ViewModels
 {
@@ -47,36 +47,59 @@ namespace ArcadePointsBot.ViewModels
         public MainWindowViewModel(IServiceProvider serviceProvider, TwitchWorker worker)
         {
             _serviceScope = serviceProvider.CreateScope();
-            _authenticationService = _serviceScope.ServiceProvider.GetRequiredService<IAuthenticationService>();
-            _rewardService = _serviceScope.ServiceProvider.GetRequiredService<TwitchPointRewardService>();
+            _authenticationService =
+                _serviceScope.ServiceProvider.GetRequiredService<IAuthenticationService>();
+            _rewardService =
+                _serviceScope.ServiceProvider.GetRequiredService<TwitchPointRewardService>();
             StatusText = "Checking Auth status";
 
             _worker = worker;
             _worker.PropertyChanged += WorkerPropertyChanged;
 
-
-            
-            CreateRewardCommand = ReactiveCommand.CreateFromTask(CreateReward,
-                Observable.CombineLatest(IsBusyObservable, this.WhenAny(x => x.IsAuthed, x => x.Value), (isBusy, isAuthed) => isBusy && isAuthed));
-            EditRewardCommand = ReactiveCommand.CreateFromTask<TwitchReward>(EditReward,
-                Observable.CombineLatest(IsBusyObservable, this.WhenAny(x => x.IsAuthed, x => x.Value), (isBusy, isAuthed) => isBusy && isAuthed));
-            DeleteRewardCommand = ReactiveCommand.CreateFromTask<TwitchReward>(DeleteReward, IsBusyObservable);
+            CreateRewardCommand = ReactiveCommand.CreateFromTask(
+                CreateReward,
+                Observable.CombineLatest(
+                    IsBusyObservable,
+                    this.WhenAny(x => x.IsAuthed, x => x.Value),
+                    (isBusy, isAuthed) => isBusy && isAuthed
+                )
+            );
+            EditRewardCommand = ReactiveCommand.CreateFromTask<TwitchReward>(
+                EditReward,
+                Observable.CombineLatest(
+                    IsBusyObservable,
+                    this.WhenAny(x => x.IsAuthed, x => x.Value),
+                    (isBusy, isAuthed) => isBusy && isAuthed
+                )
+            );
+            DeleteRewardCommand = ReactiveCommand.CreateFromTask<TwitchReward>(
+                DeleteReward,
+                IsBusyObservable
+            );
         }
 
-        private void WorkerPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void WorkerPropertyChanged(
+            object? sender,
+            System.ComponentModel.PropertyChangedEventArgs e
+        )
         {
-            if (e.PropertyName != nameof(_worker.Status)) return;
+            if (e.PropertyName != nameof(_worker.Status))
+                return;
             WorkerStatus = _worker.Status;
         }
 
         private async Task CreateReward()
         {
             IsBusy = true;
-            if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            if (
+                Avalonia.Application.Current?.ApplicationLifetime
+                is IClassicDesktopStyleApplicationLifetime desktop
+            )
             {
                 var reward = await new CreateRewardWindow()
                 {
-                    DataContext = _serviceScope.ServiceProvider.GetRequiredService<CreateRewardWindowViewModel>(),
+                    DataContext =
+                        _serviceScope.ServiceProvider.GetRequiredService<CreateRewardWindowViewModel>(),
                 }.ShowDialog<TwitchReward>(desktop.MainWindow!);
                 if (reward != null)
                 {
@@ -89,18 +112,23 @@ namespace ArcadePointsBot.ViewModels
         private async Task EditReward(TwitchReward reward)
         {
             IsBusy = true;
-            if (Avalonia.Application.Current?.ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
+            if (
+                Avalonia.Application.Current?.ApplicationLifetime
+                is IClassicDesktopStyleApplicationLifetime desktop
+            )
             {
                 var res = await new EditRewardWindow()
                 {
-                    DataContext = new EditRewardViewModel(_rewardService, await _rewardService.GetReward(reward.Id)),
+                    DataContext = new EditRewardViewModel(
+                        _rewardService,
+                        await _rewardService.GetReward(reward.Id)
+                    ),
                 }.ShowDialog<TwitchReward>(desktop.MainWindow!);
                 if (res != null)
                     _rewardList.Replace(reward, res);
             }
             IsBusy = false;
         }
-
 
         private async Task DeleteReward(TwitchReward reward)
         {
@@ -138,7 +166,10 @@ namespace ArcadePointsBot.ViewModels
                 return;
             }
 
-            if (_authenticationService.AuthConfig.AccessTokenExpiration < System.DateTimeOffset.UtcNow)
+            if (
+                _authenticationService.AuthConfig.AccessTokenExpiration
+                < System.DateTimeOffset.UtcNow
+            )
             {
                 StatusText = "Accestoken expired, refreshing token";
                 var result = await _authenticationService.RefreshCredentials();
@@ -161,11 +192,18 @@ namespace ArcadePointsBot.ViewModels
 
         internal async Task BulkDisable(List<string> toDisableIds)
         {
-            if(toDisableIds.Count == 0) return;
+            if (toDisableIds.Count == 0)
+                return;
             await _rewardService.BulkUpdateRewards(
                 _rewardList
-                .Where(x => toDisableIds.Contains(x.Id))
-                .Select(x => { x.IsEnabled = false; return x; }), u => u.SetProperty(p => p.IsEnabled, false));
+                    .Where(x => toDisableIds.Contains(x.Id))
+                    .Select(x =>
+                    {
+                        x.IsEnabled = false;
+                        return x;
+                    }),
+                u => u.SetProperty(p => p.IsEnabled, false)
+            );
             //foreach (var id in toDisableIds)
             //{
             //    var reward = _rewardList.FirstOrDefault(x => x.Id == id);
@@ -177,11 +215,18 @@ namespace ArcadePointsBot.ViewModels
 
         internal async Task BulkEnable(List<string> toEnableIds)
         {
-            if(toEnableIds.Count == 0) return;
+            if (toEnableIds.Count == 0)
+                return;
             await _rewardService.BulkUpdateRewards(
                 _rewardList
-                .Where(x => toEnableIds.Contains(x.Id))
-                .Select(x => { x.IsEnabled = true; return x; }), u => u.SetProperty(p => p.IsEnabled, true));
+                    .Where(x => toEnableIds.Contains(x.Id))
+                    .Select(x =>
+                    {
+                        x.IsEnabled = true;
+                        return x;
+                    }),
+                u => u.SetProperty(p => p.IsEnabled, true)
+            );
             //foreach (var id in toEnableIds)
             //{
             //    var reward = _rewardList.FirstOrDefault(x => x.Id == id);
@@ -195,9 +240,13 @@ namespace ArcadePointsBot.ViewModels
         {
             await _worker.StopAsync(default);
         }
+
         internal void StartWorker()
         {
-            Task.Factory.StartNew(async () => await _worker.StartAsync(default), TaskCreationOptions.LongRunning);
+            Task.Factory.StartNew(
+                async () => await _worker.StartAsync(default),
+                TaskCreationOptions.LongRunning
+            );
         }
     }
 }

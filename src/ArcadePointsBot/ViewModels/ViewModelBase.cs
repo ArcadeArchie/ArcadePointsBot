@@ -1,13 +1,13 @@
-﻿using ArcadePointsBot.Common.Primitives;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.Linq;
+using System.Reactive.Linq;
+using ArcadePointsBot.Common.Primitives;
 using Avalonia.Threading;
 using DynamicData;
 using DynamicData.Binding;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
-using System;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Reactive.Linq;
 
 namespace ArcadePointsBot.ViewModels
 {
@@ -19,7 +19,8 @@ namespace ArcadePointsBot.ViewModels
         public string? StatusText
         {
             get => _statusText;
-            set => Dispatcher.UIThread.Post(() => this.RaiseAndSetIfChanged(ref _statusText, value));
+            set =>
+                Dispatcher.UIThread.Post(() => this.RaiseAndSetIfChanged(ref _statusText, value));
         }
         private bool _isBusy;
         public bool IsBusy
@@ -27,7 +28,7 @@ namespace ArcadePointsBot.ViewModels
             get => _isBusy;
             set => Dispatcher.UIThread.Post(() => this.RaiseAndSetIfChanged(ref _isBusy, value));
         }
-        
+
         [ObservableAsProperty]
         public bool HasError { get; }
 

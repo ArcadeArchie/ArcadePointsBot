@@ -1,8 +1,8 @@
+using System;
+using ArcadePointsBot.ViewModels;
 using Avalonia.Controls;
 using Avalonia.ReactiveUI;
-using ArcadePointsBot.ViewModels;
 using ReactiveUI;
-using System;
 
 namespace ArcadePointsBot.Views
 {
@@ -11,12 +11,17 @@ namespace ArcadePointsBot.Views
         public EditRewardWindow()
         {
             InitializeComponent();
-            if (Design.IsDesignMode) return;
-            this.WhenActivated(d => d(ViewModel!.EditTwitchRewardCommand.Subscribe(x =>
-            {
-                if (x != null)
-                    Close(x);
-            })));
+            if (Design.IsDesignMode)
+                return;
+            this.WhenActivated(d =>
+                d(
+                    ViewModel!.EditTwitchRewardCommand.Subscribe(x =>
+                    {
+                        if (x != null)
+                            Close(x);
+                    })
+                )
+            );
         }
     }
 }

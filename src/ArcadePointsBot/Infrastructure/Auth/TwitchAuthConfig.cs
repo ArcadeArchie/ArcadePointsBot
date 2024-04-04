@@ -1,23 +1,24 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.CompilerServices;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace ArcadePointsBot.Auth;
+
 public class TwitchAuthConfig : INotifyPropertyChanged
 {
     private DateTimeOffset? accessTokenExpiration;
     private string? refreshToken;
     private string? identityToken;
     private string? accessToken;
-        
+
     [Required]
     public string ClientId { get; init; } = string.Empty;
-    
+
     [Required]
     public string ClientSecret { get; init; } = string.Empty;
 
@@ -70,7 +71,8 @@ public class TwitchAuthConfig : INotifyPropertyChanged
 
     private void ParseIdToken()
     {
-        if (string.IsNullOrEmpty(IdentityToken)) return;
+        if (string.IsNullOrEmpty(IdentityToken))
+            return;
         var parts = IdentityToken.Split('.');
         byte[]? json = null;
         try
@@ -90,20 +92,24 @@ public class TwitchAuthConfig : INotifyPropertyChanged
     #region INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null, object? value = null)
+    protected virtual void OnPropertyChanged(
+        [CallerMemberName] string? propertyName = null,
+        object? value = null
+    )
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgsEx(propertyName, value));
     }
-    #endregion 
-
+    #endregion
 }
+
 public class PropertyChangedEventArgsEx : PropertyChangedEventArgs
 {
     private readonly object? _value;
 
     public virtual object? Value => _value;
 
-    public PropertyChangedEventArgsEx(string? propertyName, object? value) : base(propertyName)
+    public PropertyChangedEventArgsEx(string? propertyName, object? value)
+        : base(propertyName)
     {
         _value = value;
     }

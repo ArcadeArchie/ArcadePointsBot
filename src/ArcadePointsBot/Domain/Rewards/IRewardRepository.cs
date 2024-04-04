@@ -2,7 +2,5 @@
 
 namespace ArcadePointsBot.Domain.Rewards
 {
-    public interface IRewardRepository : IEntityRepository<TwitchReward, string>
-    {
-    }
+    public interface IRewardRepository : IEntityRepository<TwitchReward, string> { }
 }

@@ -4,6 +4,7 @@ namespace ArcadePointsBot.Common.Abstractions.Messaging;
 
 internal interface ICommand<out TResponse> : Mediator.ICommand<TResponse>
     where TResponse : Result;
+
 internal interface IQuery<TResponse> : Mediator.IQuery<TResponse>
     where TResponse : Result;
 
@@ -21,6 +22,7 @@ internal interface IQueryHandler<in TQuery, TResponse> : Mediator.IQueryHandler<
 /// </summary>
 /// <typeparam name="TQuery">The query type.</typeparam>
 /// <typeparam name="TResponse">The query response type.</typeparam>
-internal interface ICommandHandler<in TCommand, TResponse> : Mediator.ICommandHandler<TCommand, TResponse>
+internal interface ICommandHandler<in TCommand, TResponse>
+    : Mediator.ICommandHandler<TCommand, TResponse>
     where TCommand : ICommand<TResponse>
     where TResponse : Result;
